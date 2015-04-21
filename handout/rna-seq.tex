@@ -87,9 +87,9 @@ the following:
 \end{description}
 
 \begin{steps}
-Open the Terminal and go to the \texttt{RNA-seq} working directory:
+Open the Terminal and go to the \texttt{rnaseq} working directory:
 \begin{lstlisting}
-cd ~/RNA-seq/
+cd ~/rnaseq/
 \end{lstlisting}
 \end{steps}
 
@@ -97,7 +97,7 @@ cd ~/RNA-seq/
 %\textcolor{red}{
 \begin{warning}
   All commands entered into the terminal for this tutorial should be from within the
-  \textbf{\texttt{$\sim$/RNA-seq}} directory.
+  \textbf{\texttt{$\sim$/rnaseq}} directory.
 \end{warning}
 
 \begin{steps}
@@ -214,7 +214,7 @@ while the latter stores the coordinates of the splice junctions present in the
 data set.
 
 \begin{steps}
-Open the \texttt{RNA-seq} directory on your Desktop and double-click the
+Open the \texttt{rnaseq} directory on your Desktop and double-click the
 \texttt{tophat} subdirectory and then the \texttt{ZV9\_2cells} directory.
 
 \begin{enumerate}
@@ -225,13 +225,13 @@ Open the \texttt{RNA-seq} directory on your Desktop and double-click the
   IGV window. Else you can also load the genome fasta file.
   \item Load the \texttt{accepted\_hits.sorted.bam} file by clicking the
   ``File'' menu, selecting ``Load from File'' and navigating to the
-  \texttt{Desktop/RNA-seq/tophat/ZV9\_2cells} directory.
+  \texttt{Desktop/rnaseq/tophat/ZV9\_2cells} directory.
   \item Rename the track by right-clicking on its name and choosing ``Rename
   Track''. Give it a meaningful name like ``2cells BAM''.
   \item Load the \texttt{junctions.bed} from the same directory and rename the
   track ``2cells Junctions BED''.
   \item Load the Ensembl annotations file \texttt{Danio\_rerio.Zv9.66.gtf}
-  stored in the \texttt{RNA-seq/annotation} directory.
+  stored in the \texttt{rnaseq/annotation} directory.
   \item Navigate to a region on chromosome 12 by typing
   \texttt{chr12:20,270,921-20,300,943} into the search box at the top of the IGV
   window.
@@ -517,8 +517,8 @@ We will use an R-Bioconductor package called \texttt{cummeRbund} to visualise, m
 \begin{steps}
 Prepare the environment. Go to the \texttt{cuffdiff} output folder and copy the transcripts file there.
 \begin{lstlisting}
-cd ~/RNA-seq/cuffdiff
-cp ~/RNA-seq/annotation/Danio_rerio.Zv9.66.gtf ~/RNA-seq/cuffdiff
+cd ~/rnaseq/cuffdiff
+cp ~/rnaseq/annotation/Danio_rerio.Zv9.66.gtf ~/rnaseq/cuffdiff
 ls -l
 \end{lstlisting}
 
@@ -532,7 +532,7 @@ library(cummeRbund)
 \end{lstlisting}
 Read in the cuffdiff output
 \begin{lstlisting}
-cuff<-readCufflinks(dir="/home/trainee/Desktop/RNA-seq/cuffdiff", \
+cuff<-readCufflinks(dir="/home/trainee/Desktop/rnaseq/cuffdiff", \
 gtfFile='Danio_rerio.Zv9.66.gtf',genome="Zv9", rebuild=T)
 \end{lstlisting}
 Assess the distribution of FPKM scores across samples
@@ -662,7 +662,7 @@ was therefore:
 \begin{steps}
 Prepare the environment and load R:
 \begin{lstlisting}
-cd ~/RNA-seq/edgeR
+cd ~/rnaseq/edgeR
 R (press enter)
 \end{lstlisting}
 
