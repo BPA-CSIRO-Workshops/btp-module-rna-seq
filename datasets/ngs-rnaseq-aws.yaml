@@ -19,6 +19,7 @@ btp::modules:
       - 'rnaseq/cufflinks/ZV9_6h_gtf_guided'
       - 'rnaseq/tophat'
       - 'rnaseq/tophat/ZV9_2cells'
+      - 'rnaseq/edgeR'
     data:
       2cells_1.fastq: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
@@ -128,3 +129,11 @@ btp::modules:
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
           - 'rnaseq/tophat/ZV9_2cells/insertions.bed'
+      pnas_expression.txt
+        source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/NGSDataRNASeq'
+        targets:
+          - 'rnaseq/edgeR/pnas_expression.txt'
+      Targets.txt
+        source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/NGSDataRNASeq'
+        targets:
+          - 'rnaseq/edgeR/Targets.txt'
