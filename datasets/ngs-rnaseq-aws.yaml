@@ -130,10 +130,10 @@ btp::modules:
         targets: 
           - 'rnaseq/tophat/ZV9_2cells/insertions.bed'
       pnas_expression.txt:
-        source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/NGSDataRNASeq'
+        source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets:
           - 'rnaseq/edgeR/pnas_expression.txt'
       Targets.txt:
-        source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/NGSDataRNASeq'
+        source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets:
           - 'rnaseq/edgeR/Targets.txt'
