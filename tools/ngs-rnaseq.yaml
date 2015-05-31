@@ -1,0 +1,28 @@
+btp::analysis_tools:
+  tophat_1.4.1-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  tophat2_2.0.13-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  cufflinks_2.2.1-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  samtools_0.1.18-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  bedtools_2.22.1-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  ucsctools_310-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  igv_2.3.40-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  igvtools_2.3.40-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  rbase_3.2.0-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
