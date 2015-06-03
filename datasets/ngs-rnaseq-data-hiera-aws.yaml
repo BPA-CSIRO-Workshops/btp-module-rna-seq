@@ -6,4 +6,4 @@
   :datadir: '/etc/puppet/'
 
 :hierarchy:
-  - ngs-rnaseq
+  - ngs-rnaseq-data-aws
