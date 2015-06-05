@@ -1,7 +1,4 @@
 btp::analysis_tools:
-  tophat_1.4.1-0_amd64.deb:
-    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
-    provider: 'dpkg'
   tophat2_2.0.13-0_amd64.deb:
     source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
     provider: 'dpkg'
