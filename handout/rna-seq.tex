@@ -492,7 +492,7 @@ different file called \texttt{gene\_exp\_qval.sorted.diff}.
 sort -t$'\t' -g -k 13 cuffdiff/gene_exp.diff > cuffdiff/gene_exp_qval.sorted.diff
 \end{lstlisting}
 
-Look again at the top 50 lines of the sorted file by typing:
+Look again at the top 20 lines of the sorted file by typing:
 \begin{lstlisting}
 head -n 20 cuffdiff/gene_exp_qval.sorted.diff
 \end{lstlisting}
@@ -642,9 +642,9 @@ Cellular component, Molecular function, Biological Processes, Tissue expression,
 \begin{warning}
 This workflow requires raw gene count files and these can be generated using a utility called featureCounts. We require alignments files in BAM format and gene annotation in GTF format for this step.
 This is a demo command and you DO NOT need to run this for this tutorial.
-\begin{steps}
-featureCounts –a <annotation.gtf> -t exon –g gene_id –o <output file name> sample1.bam sample2.bam sample3.bam
-\end{steps}
+\begin{lstlisting}[style=command_syntax]
+featureCounts -a annotation.gtf -t exon -g gene_id -o outputfile_name sample1.bam sample2.bam sample3.bam
+\end{lstlisting}
  
 \end{warning}
 
