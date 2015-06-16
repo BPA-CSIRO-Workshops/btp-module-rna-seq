@@ -268,7 +268,7 @@ Some useful IGV manuals can be found below
 
 \begin{questions}
 
-Does the file 'align_summary.txt' look interesting? What information does it provide?
+Does the file 'align\_summary.txt' look interesting? What information does it provide?
 \begin{answer}
 As the name suggests, the file provides a details summary of the alignment statistics. 
 \end{answer}
@@ -642,9 +642,11 @@ Cellular component, Molecular function, Biological Processes, Tissue expression,
 \begin{warning}
 This workflow requires raw gene count files and these can be generated using a utility called featureCounts. We require alignments files in BAM format and gene annotation in GTF format for this step.
 This is a demo command and you DO NOT need to run this for this tutorial.
+\begin{steps}
 \begin{lstlisting}[style=command_syntax]
 featureCounts -a annotation.gtf -t exon -g gene_id -o outputfile_name sample1.bam sample2.bam sample3.bam
 \end{lstlisting}
+\end{steps}
  
 \end{warning}
 
