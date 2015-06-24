@@ -96,7 +96,7 @@ btp::modules:
         targets: 
           - 'rnaseq/genome/ZV9_bowtie_index/ZV9.4.ebwt'
       ZV9.rev.1.ebwt: 
-        source: 'https://swift.rc.nectar.org.au:8889/v1/AUTH_809/NGSDataRNASeq'
+        source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/NGSDataRNASeq'
         targets: 
           - 'rnaseq/genome/ZV9_bowtie_index/ZV9.rev.1.ebwt'
       ZV9.rev.2.ebwt: 
