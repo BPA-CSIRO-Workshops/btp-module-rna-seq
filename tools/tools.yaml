@@ -14,10 +14,10 @@ btp::analysis_tools:
   ucsctools_310-0_amd64.deb:
     source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
     provider: 'dpkg'
-  igv_2.3.40-0_amd64.deb:
+  igv_2.3.59-0_amd64.deb:
     source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
     provider: 'dpkg'
-  igvtools_2.3.40-0_amd64.deb:
+  igvtools_2.3.59-0_amd64.deb:
     source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
     provider: 'dpkg'
   rbase_3.2.0-0_amd64.deb:
