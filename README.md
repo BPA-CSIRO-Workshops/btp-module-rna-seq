@@ -18,8 +18,6 @@ Bioinformatics Training Platform (BTP) Module: RNA-Seq
     * Be familiar with R environment and be able to run R based RNA-seq packages.
   * Time Required
     * 6 hrs
-  * Compute Requirements
-    * 
 
 License
 =======
