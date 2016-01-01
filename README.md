@@ -17,7 +17,7 @@ Bioinformatics Training Platform (BTP) Module: RNA-Seq
     * Be able to identify differential gene expression between two experimental conditions.
     * Be familiar with R environment and be able to run R based RNA-seq packages.
   * Time Required
-    * 
+    * 6 hrs
   * Compute Requirements
     * 
 
