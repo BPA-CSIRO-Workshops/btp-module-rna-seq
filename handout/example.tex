@@ -146,13 +146,13 @@ I won't pretend to be an expert in \LaTeX but I do know that one of the strength
 ability to allow mathematical formulas to be constructed and typeset very easily. Firstly, you have
 to tell \LaTeX what text is going to contain mathematical symbols.
 
-For inline display, simply surround the relevant text by dollar signs: \verb+$Q(A) =-10 log10(P(\simA))$+
+For inline display, simply surround the relevant text by dollar signs: \verb+$Q(A) =-10 log10(P(\sim A))$+
 
 For more complex mathematical formulas which need to be displayed separately, use the
 \verb+\begin{displaymath} ... \end{displaymath}+ environment to wrap around your formulas.
 
 \begin{displaymath}
-Q(A) =-10 log10(P(\simA))
+Q(A) =-10 log10(P(\sim A))
 \end{displaymath} 
 
 
@@ -183,6 +183,7 @@ To provide a nicely formatted, copy-and-pastable command, simply wrap it in the
 \verb+\begin{lstlisting} ... \end{lstlisting}+ environment. Long commands will be wrapped
 automatically and bash line continuation characters (\textbackslash) inserted where required.
 
+\begin{steps}
 \begin{lstlisting}
 cd ~/QC
 fastx_clipper -h
