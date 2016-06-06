@@ -1,14 +1,15 @@
 % Define the top matter
 \setModuleTitle{RNA-Seq}
 \setModuleAuthors{%
-  Myrto Kostadima, EMBL-EBI \mailto{kostadmi@ebi.ac.uk}\\
-  Remco Loos, EMBL-EBI \mailto{remco@ebi.ac.uk} \\
-  Sonika Tyagi, AGRF \mailto{sonika.tyagi@agrf.org.au}%
+    Susan M Corley \mailto{s.corley@unsw.edu.au}% 
+    Sonika Tyagi, AGRF \mailto{sonika.tyagi@agrf.org.au}%
+    Nandan Deshpande \mailto{n.deshpande@unsw.edu.au}%
 }
 \setModuleContributions{%
   Nathan S. Watson-Haigh \mailto{nathan.haigh@acpfg.com.au} \\
-  Susan M Corley \mailto{s.corley@unsw.edu.au}% 
-  Nandan Deshpande \mailto{n.deshpande@unsw.edu.au}%
+  Myrto Kostadima, EMBL-EBI \mailto{kostadmi@ebi.ac.uk}\\
+  Remco Loos, EMBL-EBI \mailto{remco@ebi.ac.uk} \\
+
 }
 
 % Start: Module Title Page
@@ -22,10 +23,16 @@ After completing this practical the trainee should be able to:
 \begin{itemize}
   \item Understand and perform a simple RNA-Seq analysis workflow.
   \item Perform spliced alignments to an indexed reference genome using TopHat.
-  \item Perform transcript assembly using Cufflinks.
-  \item Visualize transcript alignments and annotation in a genome browser such as IGV.
+  \item  Visualize spliced transcript alignments in a genome browser such as IGV.
   \item Be able to identify differential gene expression between two experimental conditions.
   \item Be familiar with R environment and be able to run R based RNA-seq packages.
+\end{itemize}
+
+We also have bonus exercises on where you can learn to:
+\begin{itemize}
+  \item Perform transcript assembly using Cufflinks.
+  \item Run cuffdiff, a Cufflinks utility for differential expression analysis.
+  \item Visualize transcript alignments and annotation in a genome browser such as IGV.
 \end{itemize}
 
 \section{Resources You'll be Using}
@@ -44,8 +51,6 @@ After completing this practical the trainee should be able to:
     \url{http://hgdownload.cse.ucsc.edu/admin/exe/}
   \item[IGV] \hfill\\
     \url{http://www.broadinstitute.org/igv/}
-  \item[DAVID Functional Analysis] \hfill\\
-    \url{http://david.abcc.ncifcrf.gov/}
   \item[FeatureCount] \hfill\\
     \url{http://subread.sourceforge.net/}
   \item[edgeR pakcage] \hfill\\
@@ -66,12 +71,13 @@ The goal of this hands-on session is to perform some basic tasks in the
 downstream analysis of RNA-seq data. We will start from RNA-seq data aligned to
 the zebrafish genome using Tophat.
 
-We will perform transcriptome reconstruction using Cufflinks and we will compare
+we will be demonstrating usage of R-based packages to perform differential expression analysis.
+We will be using edgeR for the demonstration. The gene/tag counts generated from the alignment are used as input for edgeR.
+
+In the second part of the tutorial We will also perform transcriptome reconstruction using Cufflinks and we will compare
 the gene expression between two different conditions in order to identify
 differentially expressed genes.
 
-In the second part of the tutorial we will also be demonstrating usage of R-based packages to perform differential expression analysis.
-We will be using edgeR for the demonstration. The gene/tag counts generated from the alignment are used as input for edgeR.
 \section{Prepare the Environment}
 We will use a dataset derived from sequencing of mRNA from \textit{Danio rerio} embryos
 in two different developmental stages. Sequencing was performed on the Illumina
@@ -113,9 +119,9 @@ ls data
 \section{Alignment}
 There are numerous tools for performing short read alignment and the choice of aligner
 should be carefully made according to the analysis goals/requirements. Here we will
-use Tophat, a widely used ultrafast aligner that performs spliced alignments.
+use Tophat2, a widely used ultrafast aligner that performs spliced alignments.
 
-Tophat is based on the Bowtie aligner and uses an indexed genome for the
+Tophat2 is based on the Bowtie2 aligner and uses an indexed genome for the
 alignment to speed up the alignment and keep its memory footprint small. 
 The the index for the \textit{Danio rerio} genome has been created for you. 
 
@@ -128,14 +134,14 @@ bowtie2-build genome/Danio_rerio.Zv9.66.dna.fa genome/ZV9
 \end{warning}
 
 \begin{steps}
-Tophat has a number of parameters in order to perform the alignment. To view them all type:
+Tophat2 has a number of parameters in order to perform the alignment. To view them all type:
 \begin{lstlisting}
 tophat2 --help
 \end{lstlisting}
 \end{steps}
 
 \begin{information}
-The general format of the tophat command is:
+The general format of the tophat2 command is:
 \begin{lstlisting}[style=command_syntax]
 tophat2 [options]* <index_base> <reads_1> <reads_2>
 \end{lstlisting}
@@ -300,19 +306,20 @@ samtools index tophat/ZV9_6h/accepted_hits.sorted.bam
 Load the sorted BAM file into IGV, as described previously, and rename the track appropriately.
 \end{steps}
 
-\newpage
-\section{Differential Gene Expression Analysis using edgeR}
+\section{Generating Gene Counts}
 
-\begin{warning}
-This workflow requires raw gene count files and these can be generated using a utility called featureCounts. We require alignments files in BAM format and gene annotation in GTF format for this step.
-This is a demo command and you DO NOT need to run this for this tutorial.
+In RNAseq experiments the digital gene expression is recorded as the gene counts or number of reads aligning to a known gene feature. If you have a well annotated genome, you can use the gene structure file in a standard gene annotation format (GTF or GFF)) along with the spliced alignment file to quantify the known genes. We will demonstrate a utility called \texttt{FeatureCounts} that comes with the \texttt{Subread} package. 
+
+%%%%% TEST THIS SECTION
 \begin{steps}
 \begin{lstlisting}[style=command_syntax]
-featureCounts -a annotation.gtf -t exon -g gene_id -o outputfile_name sample1.bam sample2.bam sample3.bam
+featureCounts -a Danio_rerio.Zv9.66.gtf -t exon -g gene_id -o gene_counts.txt tophat/ZV9_6h/accepted_hits.sorted.bam tophat/ZV9_6h/accepted_hits.sorted.bam
 \end{lstlisting}
 \end{steps}
- 
-\end{warning}
+
+
+\newpage
+\section{Differential Gene Expression Analysis using edgeR}
 
 \begin{information}
 The example we are working through today follows a case Study set out in the edgeR Users
@@ -346,6 +353,12 @@ was therefore:
   \label{tab:experimental_design}
 \end{table}
 \end{information}
+
+\begin{notes}}
+This workflow requires raw gene count files and these can be generated using a utility called featureCounts as demonstrated above. We are using a pre-computed gene counts data (stored in \texttt{pnas_expression.txt}) for this data for this exercise.
+\end{notes}}
+
+
 
 \begin{steps}
 Prepare the environment and load R:
@@ -572,46 +585,15 @@ Please note that the output files you are creating are saved in your present wor
 \end{note}
 
 
-\newpage
-\begin{advanced}
-\section{Functional Annotation of Differentially Expressed Genes}
-
-After you have performed the differential expression analysis you are interested
-in identifying if there is any functionality enrichment for your differentially
-expressed genes.
-On your Desktop click:
-
-\begin{lstlisting}[style=command_syntax]
-Applications >> Internet >> Firefox Web Browser
-\end{lstlisting}
-
-And go to the following URL: \url{http://david.abcc.ncifcrf.gov/}
-On the left side click on Functional Annotation. Then click on the Upload tab.
-Under the section Choose from File, click Choose File and navigate to the
-\texttt{cuffdiff} directory. Select the file called \texttt{globalDiffExprs\_Genes\_qval.01\_top100.tab}.
-Under Step 2 select ENSEMBL\_GENE\_ID from the drop-down menu. Finally select
-Gene list and then press Submit List.
-Click on Gene Ontology and then click on the CHART button of the GOTERM\_BP\_ALL item.
-
-\begin{questions}
-Do these categories make sense given the samples we're studying?
-\begin{answer}
-Developmental Biology
-\end{answer}
-
-Browse around DAVID website and check what other information are available.
-\begin{answer}
-Cellular component, Molecular function, Biological Processes, Tissue expression, Pathways, Literature, Protein domains 
-\end{answer}
-\end{questions}
-\end{advanced}
-
-
-
 % Bonus cufflinks
 
 \newpage
 \section{Isoform Expression and Transcriptome Assembly}
+
+\begin{information}
+For non-model organisms and genomes with draft assemblies and incomplete annotations, it is a common practice to take and assembly based approach to generate gene structures followed by the quantification step. There are a number of reference based transcript assemblers available that can be used for this purpose such as, cufflinks, stringy. These assemblers can give gene or isoform level assemblies that can be used to perform a gene/isoform level quantification. These assemblers require an alignment of reads with a reference genome or transcriptome as an input. The second optional input is a known gene structure in \textt{GTF} or \text{GFF} format. 
+\end{information}
+
 There are a number of tools that perform reconstruction of the transcriptome
 and for this workshop we are going to use Cufflinks. Cufflinks can do
 transcriptome assembly either \textit{ab initio} or using a reference annotation. It
@@ -685,6 +667,8 @@ Cufflinks generates several files in the specified output directory. Here's a sh
 \end{description}
 
 The complete documentation can be found at:
+
+%%% Make sure the URL is current
 \url{http://cufflinks.cbcb.umd.edu/manual.html#cufflinks_output}
 \end{information}
 
