@@ -378,10 +378,12 @@ library("limma")library("RColorBrewer")library("org.Hs.eg.db")
 
 \subsection{Read in Data}
 Read in count table and experimental design:
+
+\begin{steps}
 \begin{lstlisting}
 data <- read.delim("pnas_expression.txt", row.names=1, header=T)targets <- read.delim("Targets.txt", header=T)colnames(data) <-targets$Labelhead(data, n=20)
 \end{lstlisting}
-
+\end{steps}
 \subsection {Add Gene annotation}
 
 %Add ensemble annotation to the genes
