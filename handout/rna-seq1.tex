@@ -608,6 +608,70 @@ How many upregulated genes and downregulated genes do we have?
 
 
 
+
+\newpage
+\section{Differential expression using the Voom function and the limma package}We will now do show an alternative approach to differential expression which uses the \textt{limma} package.This is based on linear models. The first step is to create a design matrix. In this case we have a simple design where we have only one condition (treated vs non-treated). However, you may be dealing with more complex experimental designs, for example looking at treatment and other covariates, such as age, gender, batch.
+
+
+\begin{steps}
+\begin{lstlisting}
+design <-model.matrix(~treatment)check designprint(design)
+\end{lstlisting}
+We now use voom to transform the data into a form which is appropriate for linear modeling.
+\begin{lstlisting}
+v <-voom(y, design)
+\end{lstlisting}
+\end{steps}Next we fit linear model to each gene in the dataset using the function lmFit.  Following this we use the function eBayes to test  each gene to find whether foldchange between the conditions being tested is statistically significant.We filter our results by using the same values of alpha (0.05) and log fold change (1.5) used previously.
+
+\begin{steps}
+\begin{lstlisting}
+fit_v <-lmFit(v, design) fit_v <- eBayes(fit_v)voom_res<-topTable(fit_v, coef=2,adjust.method="BH", sort.by="P", n=nrow(y$counts)) voom_res_sig <-voom_res[voom_res$adj.P.Val <alpha,]voom_res_sig_lfc <-voom_res_sig[abs(voom_res_sig$logFC) >= lfc,]
+\end{lstlisting}
+\end{steps}How many differentially expressed genes are identified?
+
+\begin{steps}
+\begin{lstlisting}nrow(voom_res_sig)nrow(voom_res_sig_lfc)
+\end{lstlisting}
+\end{steps}
+We will write out these results.
+
+\begin{steps}
+\begin{lstlisting}
+write.table(voom_res_sig, "voom_res_sig.txt", sep="\t", col.names=NA, quote=F)write.table(voom_res_sig_lfc, "voom_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)write.table(voom_res, "voom_res.txt", sep="\t", col.names=NA, quote=F) # to be used when background genes are required in downstream analysis
+\end{lstlisting}
+\end{steps}
+
+\section{Data Visualisation}
+Now let’s visualize some of this data. First we will make a volcano plot using the volcanoplot function available in limma. This creates a plot which displays fold changes versus a measure of statistical significance of the change.
+
+\begin{steps}
+\begin{lstlisting}volcanoplot(fit_v, coef=2, highlight=5)
+\end{lstlisting}
+\end{steps}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{handout/Volcano.png}
+\caption{Volcano Plot}
+\label{fig:Volcano plot}
+\end{figure}
+
+
+Next we will create a heatmap of the top differentially expressed genes. We use the heatmap.2 function available in the gplots package.
+\begin{steps}
+\begin{lstlisting}select_top  <- p.adjust(fit_v$p.value[, 2]) <1e-2Exp_top <- v$E [select_top, ]heatmap.2(Exp_top, scale="row", density.info="none", trace="none", main="Top DEGs", labRow="", cexRow=0.4, cexCol=0.8)
+\end{lstlisting}
+\end{steps}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{handout/Heatmap.png}
+\caption{Heatmap of DE genes}
+\label{fig:Heatmap}
+\end{figure}
+
+
+% END of the R SESSION
 You can now quit the R prompt
 \begin{lstlisting}
 q()
@@ -617,7 +681,6 @@ q()
 \begin{note}
 Please note that the output files you are creating are saved in your present working directory. If you are not sure where you are in the file system try typing \texttt{pwd} on your command prompt to find out.
 \end{note}
-
 
 % Bonus cufflinks: This will be run only for the longer workshops. Skip for 2day format. Users can try the commands at home.
 
