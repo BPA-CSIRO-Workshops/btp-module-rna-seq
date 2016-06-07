@@ -321,7 +321,7 @@ featureCounts -a Danio_rerio.Zv9.66.gtf -t exon -g gene_id -o gene_counts.txt to
 \newpage
 \section{Differential Gene Expression Analysis using edgeR}
 
-\begin{information}
+\subsection{Experiment Design}
 The example we are working through today follows a case Study set out in the edgeR Users
 Guide (4.3 Androgen-treated prostate cancer cells (RNA-Seq, two groups) which is based on
 an experiment conducted by Li et al. (2008, Proc Natl Acad Sci USA, 105, 20179-84).
@@ -347,15 +347,19 @@ was therefore:
     5    & DHT & DHT1 \\
     6    & DHT & DHT2 \\
     7    & DHT & DHT3 \\
+
     \bottomrule
     \end{tabular}
   \label{tab:experimental_design}
 \end{table}
-\end{information}
 
-\begin{note}
-This workflow requires raw gene count files and these can be generated using a utility called featureCounts as demonstrated above. We are using a pre-computed gene counts data (stored in \texttt{pnas\_expression.txt}) for this data for this exercise.
-\end{note}
+
+\begin{notes}}
+This workflow requires raw gene count files and these can be generated using a utility called featureCounts as demonstrated above. We are using a pre-computed gene counts data (stored in \texttt{pnas_expression.txt}) for this exercise.
+\end{notes}}
+
+
+\subsection{Prepare the Environment}
 
 \begin{steps}
 Prepare the environment and load R:
@@ -369,23 +373,61 @@ Once on the R prompt. Load libraries:
 library(edgeR)
 library(biomaRt)
 library(gplots)
+library("limma")library("RColorBrewer")library("org.Hs.eg.db")
 \end{lstlisting}
 
+\subsection{Read in Data}
 Read in count table and experimental design:
+
+\begin{steps}
 \begin{lstlisting}
-data <- read.delim("pnas_expression.txt", row.names=1, header=T)
-targets <- read.delim("Targets.txt", header=T)
+data <- read.delim("pnas_expression.txt", row.names=1, header=T)targets <- read.delim("Targets.txt", header=T)colnames(data) <-targets$Labelhead(data, n=20)
+\end{lstlisting}
+\end{steps}
+\subsection {Add Gene annotation}
+
+%Add ensemble annotation to the genes
+The data set only includes the Ensembl gene id and the counts. It is useful to have other annotations such as the gene symbol and entrez id. Next we will add in these annotations.  We will use the BiomaRt package to do this.
+
+
+\begin{steps}
+We start by using the useMart function of BiomaRt to access the human data base of ensemble gene ids.  
+
+\begin{lstlisting}
+human<-useMart(host="www.ensembl.org", "ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") attributes=c("ensembl_gene_id", "entrezgene","hgnc_symbol")
 \end{lstlisting}
 
+We create a vector of our ensemble gene ids.
+\begin{lstlisting}
+ensembl_names<-rownames(data)head(ensembl_names)
+\end{lstlisting}
+We then use the function getBM to get the gene symbol data we wantThis takes about a minute.
+
+\begin{lstlisting}
+genemap<-getBM(attributes, filters="ensembl_gene_id", values=ensembl_names, mart=human)
+\end{lstlisting}Have a look at the start of the genemap dataframe.
+
+\begin{lstlisting}
+head(genemap)
+\end{lstlisting}We then match the data we have retrieved to our dataset.
+
+\begin{lstlisting}
+idx <-match(ensembl_names, genemap$ensembl_gene_id)data$entrezgene <-genemap$entrezgene [ idx ]data$hgnc_symbol <-genemap$hgnc_symbol [ idx ]Ann <- cbind(rownames(data), data$hgnc_symbol, data$entrezgene)colnames(Ann)<-c("Ensembl", "Symbol", "Entrez")Ann<-as.data.frame(Ann)
+\end{lstlisting}Let’s check and see that this additional information is there.
+\begin{lstlisting}
+head(data)
+\end{lstlisting}
+\end{steps}
+%%
+
+\subsection{Data checks}
 Create DGEList object:
 \begin{lstlisting}
-y <- DGEList(counts=data[,1:7], group=targets$Treatment)
+treatment <-factor(c(rep("Control",4), rep("DHT",3)), levels=c("Control", "DHT"))
+y <-DGEList(counts=data[,1:7], group=treatment, genes=Ann)
 \end{lstlisting}
 
-Change the column names of the object to align with treatment:
-\begin{lstlisting}
-colnames(y) <- targets$Label
-\end{lstlisting}
+
 
 Check the dimensions of the object:
 \begin{lstlisting}
@@ -415,6 +457,20 @@ do 37435-16494.
 \end{answer}
 \end{questions}
 
+
+As we have removed the lowly expressed genes the total number of counts per sample has not changed greatly. Let us check the total number of reads per sample in the original data (data) and now after filtering.
+
+\begin{steps}
+Before:	
+
+
+\begin{lstlisting}
+colSums(data[,1:7])
+After filtering:
+colSums(y$counts)
+\end{lstlisting}\end{steps}
+
+
 \begin{steps}
 We will now perform normalization to take account of different library size:
 \begin{lstlisting}
@@ -440,13 +496,29 @@ plotMDS(y)
 \label{fig:MDS plot}
 \end{figure}
 
+\begin{questions}
+Does the MDS plot indicate a difference in gene expression between the Controls and the DHT treated samples?\begin{answer}
+The MDS plot shows us that the controls are separated from the DHT treated cells. This indicates that there is a difference in gene expression between the conditions.	
+\end{answer}
+\end{questions}
+We will now estimate the dispersion. We start by estimating the common dispersion. The common dispersion estimates the overall Biological Coefficient of Variation (BCV) of the dataset averaged over all genes. 
+\begin{steps}
+By using verbose we get the Disp and BCV values printed on the screen
+\begin{lstlisting}
+y <- estimateCommonDisp(y, verbose=T)
+\end{lstlisting}
+
+\begin{questions}
+What value to you see for BCV?
+\end{questions}
 
 \begin{steps}
-We now estimate common and gene-specific dispersion:
+We now estimate gene-specific dispersion.
 \begin{lstlisting}
-y <- estimateCommonDisp(y) 
 y <- estimateTagwiseDisp(y) 
 \end{lstlisting}
+
+
 
 We will plot the tagwise dispersion and the common dispersion (You should obtain a plot as shown in the Figure 5):
 \begin{lstlisting}
@@ -466,8 +538,22 @@ We see here that the common dispersion estimates the overall Biological Coeffici
 Variation (BCV) of the dataset averaged over all genes. The common dispersion is
 \texttt{0.02} and the BCV is the square root of the common dispersion (sqrt[0.02] = 0.14).
 A BCV of 14\% is typical for cell line experiment.
+
+As you can see from the plot the BCV of some genes (generally those with low expression) can be much higher than the common dispersion. For example we see genes with a reasonable level of expression with tagwise dispersion of 0.4 indicating 40\% variation between samples. 
 \end{information}
 
+
+\begin{questions}
+If we used the common dispersion for these genes instead of the tagwise dispersion what effect would this have?	
+\end{questions}
+
+
+\begin{information}
+If we simply used the common dispersion for these genes we would underestimate biological variability, which in turn affects whether these genes would be identified as being differentially expressed between conditions.It is recommended to use the tagwise dispersion, which takes account of gene-to-gene variability.
+	
+\end{information}Now that we have normalized our data and also calculated the variability of gene expression between samples we are in a position to perform differential expression testing.As this is a simple comparison between two conditions, androgen treatment and placebo treatment we can use the exact test for the negative binomial distribution (Robinson and Smyth, 2008). 
+
+\subsection{Testing for Differential Expression}
 \begin{steps}
 We now test for differentially expressed BCV genes:
 \begin{lstlisting}
@@ -487,90 +573,107 @@ head(res)
 \end{lstlisting}
 \end{steps}
 
-\begin{information}
-You can see we have the ensemble gene identifier in the first column, the log fold change
-in the second column, the the logCPM, the P-Value and the adjusted P-Value. The ensemble
-gene identifier is not as helpful as the gene symbol so let's add in a column with the
-gene symbol. We will use the \texttt{BiomaRt} package to do this.
-\end{information}
+
+To get a summary of the number of differentially expressed genes we can use the decideTestsDGE function.
+\begin{steps}
+\beging{lstlisting}summary(de <- decideTestsDGE(et))
+\end{lstlisting}
+\end{steps}
+This tells us that 2096 genes are downregulated and 2339 genes are upregulated at 5\% FDR.We will now make subsets of the most significant upregulated and downregulated genes.
 
 \begin{steps}
-item We start by using the \texttt{useMart} function of \texttt{BiomaRt} to access the
-human data base of ensemble gene ids. Then we create a vector of our ensemble gene ids:
-\begin{lstlisting}
-ensembl_names<-rownames(res)
-ensembl<-useMart("ensembl", dataset="hsapiens_gene_ensembl")
+\begin{lstlisting}alpha=0.05lfc=1.5edgeR_res_sig<-res[res$FDR<alpha,]edgeR_res_sig_lfc <-edgeR_res_sig[abs(edgeR_res_sig$logFC) >= lfc,]head(edgeR_res_sig, n=20)nrow(edgeR_res_sig)nrow(edgeR_res_sig_lfc)
+
 \end{lstlisting}
-
-We then use the function \texttt{getBM} to get the gene symbol data we want 
-\begin{note}
-Tthis can take about a minute or so to complete.
-\end{note}
+\end{steps}
+We can write out these results to our current directory.
+\begin{steps}
 \begin{lstlisting}
-genemap <-getBM( attributes= c("ensembl_gene_id", "entrezgene", "hgnc_symbol"), filters="ensembl_gene_id", values=ensembl_names, mart=ensembl)
-\end{lstlisting}
-
-Have a look at the start of the genemap dataframe:
-\begin{lstlisting}
-head(genemap)
-\end{lstlisting}
-
-We see that we have 3 columns, the ensemble id, the entrez gene id and the hgnc symbol
-We use the match function to match up our data with the data we have just retrieved from
-the database.
-
-\begin{lstlisting}
-idx <- match(ensembl_names, genemap$ensembl_gene_id )
-res$entrez <-genemap$entrezgene [ idx ]
-res$hgnc_symbol <- genemap$hgnc_symbol [ idx ]
-\end{lstlisting}
-
-Next we have a look at the head of our \texttt{res} dataframe:
-\begin{lstlisting}
-head(res)
-\end{lstlisting}
-As you see we have now added the hgnc symbol and the entrez id to our results.
-
-
-
-
-Let's now make a subset of the most significant upregulated and downregulated genes:
-\begin{lstlisting}
-de<-res[res$FDR<0.05, ]
-de_upreg <-res[res$FDR<0.05 & res$logFC >0,] 
-de_downreg <-res[res$FDR<0.05 & res$logFC <0,] 
+write.table(edgeR_res_sig , "edgeR_res_sig.txt", sep="\t", col.names=NA, quote=F)write.table(edgeR_res_sig_lfc , "edgeR_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)
 \end{lstlisting}
 
 \end{steps}
 
 \begin{questions}
-How many differentially expressed genes are there? (Hint: Try \texttt{str(de)}
+How many differentially expressed genes are there? 
 \begin{answer}
-4429
+4435
 \end{answer}
 
 How many upregulated genes and downregulated genes do we have?
 \begin{answer}
-str(de\_upreg) = 2345
-str(de\_downreg) = 2084
+2339
+2096
 \end{answer}
 
 \end{questions}
 
+
+
+
+\newpage
+\section{Differential expression using the Voom function and the limma package}We will now do show an alternative approach to differential expression which uses the \textt{limma} package.This is based on linear models. The first step is to create a design matrix. In this case we have a simple design where we have only one condition (treated vs non-treated). However, you may be dealing with more complex experimental designs, for example looking at treatment and other covariates, such as age, gender, batch.
+
+
 \begin{steps}
-Lets write out these results:
 \begin{lstlisting}
-write.csv( as.data.frame(de), file="DEGs.csv")
+design <-model.matrix(~treatment)check designprint(design)
 \end{lstlisting}
-You can try running the list through DAVID for functional annotation.
-We will select top 100 genes from the differential expressed list and write those to a separate list.
-
+We now use voom to transform the data into a form which is appropriate for linear modeling.
 \begin{lstlisting}
-de_top_3000 <-de[1:3000,]
-de_top_gene_symbols <-de_top_3000$hgnc_symbol
-write(de_top_gene_symbols, "DE_gene_symbols.txt", sep="\t")
+v <-voom(y, design)
 \end{lstlisting}
+\end{steps}Next we fit linear model to each gene in the dataset using the function lmFit.  Following this we use the function eBayes to test  each gene to find whether foldchange between the conditions being tested is statistically significant.We filter our results by using the same values of alpha (0.05) and log fold change (1.5) used previously.
 
+\begin{steps}
+\begin{lstlisting}
+fit_v <-lmFit(v, design) fit_v <- eBayes(fit_v)voom_res<-topTable(fit_v, coef=2,adjust.method="BH", sort.by="P", n=nrow(y$counts)) voom_res_sig <-voom_res[voom_res$adj.P.Val <alpha,]voom_res_sig_lfc <-voom_res_sig[abs(voom_res_sig$logFC) >= lfc,]
+\end{lstlisting}
+\end{steps}How many differentially expressed genes are identified?
+
+\begin{steps}
+\begin{lstlisting}nrow(voom_res_sig)nrow(voom_res_sig_lfc)
+\end{lstlisting}
+\end{steps}
+We will write out these results.
+
+\begin{steps}
+\begin{lstlisting}
+write.table(voom_res_sig, "voom_res_sig.txt", sep="\t", col.names=NA, quote=F)write.table(voom_res_sig_lfc, "voom_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)write.table(voom_res, "voom_res.txt", sep="\t", col.names=NA, quote=F) # to be used when background genes are required in downstream analysis
+\end{lstlisting}
+\end{steps}
+
+\section{Data Visualisation}
+Now let’s visualize some of this data. First we will make a volcano plot using the volcanoplot function available in limma. This creates a plot which displays fold changes versus a measure of statistical significance of the change.
+
+\begin{steps}
+\begin{lstlisting}volcanoplot(fit_v, coef=2, highlight=5)
+\end{lstlisting}
+\end{steps}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{handout/Volcano.png}
+\caption{Volcano Plot}
+\label{fig:Volcano plot}
+\end{figure}
+
+
+Next we will create a heatmap of the top differentially expressed genes. We use the heatmap.2 function available in the gplots package.
+\begin{steps}
+\begin{lstlisting}select_top  <- p.adjust(fit_v$p.value[, 2]) <1e-2Exp_top <- v$E [select_top, ]heatmap.2(Exp_top, scale="row", density.info="none", trace="none", main="Top DEGs", labRow="", cexRow=0.4, cexCol=0.8)
+\end{lstlisting}
+\end{steps}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{handout/Heatmap.png}
+\caption{Heatmap of DE genes}
+\label{fig:Heatmap}
+\end{figure}
+
+
+% END of the R SESSION
 You can now quit the R prompt
 \begin{lstlisting}
 q()
@@ -581,8 +684,7 @@ q()
 Please note that the output files you are creating are saved in your present working directory. If you are not sure where you are in the file system try typing \texttt{pwd} on your command prompt to find out.
 \end{note}
 
-
-% Bonus cufflinks
+% Bonus cufflinks: This will be run only for the longer workshops. Skip for 2day format. Users can try the commands at home.
 
 \newpage
 \section{Isoform Expression and Transcriptome Assembly}
