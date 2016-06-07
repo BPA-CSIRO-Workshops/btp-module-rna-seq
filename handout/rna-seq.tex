@@ -79,7 +79,7 @@ the gene expression between two different conditions in order to identify
 differentially expressed genes.
 
 \section{Prepare the Environment}
-We will use a dataset derived from sequencing of mRNA from \textit{Danio rerio} embryos
+We will use a dataset derived from sequencing of mRNA from \texttt{Danio rerio} embryos
 in two different developmental stages. Sequencing was performed on the Illumina
 platform and generated 76bp paired-end sequence data using polyA selected RNA.
 Due to the time constraints of the practical we will only use a subset of the
@@ -123,7 +123,7 @@ use Tophat2, a widely used ultrafast aligner that performs spliced alignments.
 
 Tophat2 is based on the Bowtie2 aligner and uses an indexed genome for the
 alignment to speed up the alignment and keep its memory footprint small. 
-The the index for the \textit{Danio rerio} genome has been created for you. 
+The the index for the \texttt{Danio rerio} genome has been created for you. 
 
 \begin{warning}
 The command to create an index is as follows. You DO NOT need to run this command
@@ -353,11 +353,9 @@ was therefore:
   \label{tab:experimental_design}
 \end{table}
 
-
-\begin{notes}}
-This workflow requires raw gene count files and these can be generated using a utility called featureCounts as demonstrated above. We are using a pre-computed gene counts data (stored in \texttt{pnas_expression.txt}) for this exercise.
-\end{notes}}
-
+\begin{note}
+This workflow requires raw gene count files and these can be generated using a utility called featureCounts as demonstrated above. We are using a pre-computed gene counts data (stored in \texttt{pnas\_expression.txt}) for this exercise.
+\end{note}
 
 \subsection{Prepare the Environment}
 
@@ -373,7 +371,7 @@ Once on the R prompt. Load libraries:
 library(edgeR)
 library(biomaRt)
 library(gplots)
-library("limma")library("RColorBrewer")library("org.Hs.eg.db")
+library("limma")library("RColorBrewer")library("org.Hs.eg.db")
 \end{lstlisting}
 
 \subsection{Read in Data}
@@ -381,7 +379,7 @@ Read in count table and experimental design:
 
 \begin{steps}
 \begin{lstlisting}
-data <- read.delim("pnas_expression.txt", row.names=1, header=T)targets <- read.delim("Targets.txt", header=T)colnames(data) <-targets$Labelhead(data, n=20)
+data <- read.delim("pnas_expression.txt", row.names=1, header=T)targets <- read.delim("Targets.txt", header=T)colnames(data) <-targets$Labelhead(data, n=20)
 \end{lstlisting}
 \end{steps}
 \subsection {Add Gene annotation}
@@ -394,29 +392,29 @@ The data set only includes the Ensembl gene id and the counts. It is useful to h
 We start by using the useMart function of BiomaRt to access the human data base of ensemble gene ids.  
 
 \begin{lstlisting}
-human<-useMart(host="www.ensembl.org", "ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") attributes=c("ensembl_gene_id", "entrezgene","hgnc_symbol")
+human<-useMart(host="www.ensembl.org", "ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") attributes=c("ensembl_gene_id", "entrezgene","hgnc_symbol")
 \end{lstlisting}
 
 We create a vector of our ensemble gene ids.
 \begin{lstlisting}
-ensembl_names<-rownames(data)head(ensembl_names)
+ensembl_names<-rownames(data)head(ensembl_names)
 \end{lstlisting}
-We then use the function getBM to get the gene symbol data we wantThis takes about a minute.
+We then use the function getBM to get the gene symbol data we wantThis takes about a minute.
 
 \begin{lstlisting}
 genemap<-getBM(attributes, filters="ensembl_gene_id", values=ensembl_names, mart=human)
-\end{lstlisting}Have a look at the start of the genemap dataframe.
+\end{lstlisting}Have a look at the start of the genemap dataframe.
 
 \begin{lstlisting}
 head(genemap)
-\end{lstlisting}We then match the data we have retrieved to our dataset.
+\end{lstlisting}We then match the data we have retrieved to our dataset.
 
 \begin{lstlisting}
-idx <-match(ensembl_names, genemap$ensembl_gene_id)data$entrezgene <-genemap$entrezgene [ idx ]data$hgnc_symbol <-genemap$hgnc_symbol [ idx ]Ann <- cbind(rownames(data), data$hgnc_symbol, data$entrezgene)colnames(Ann)<-c("Ensembl", "Symbol", "Entrez")Ann<-as.data.frame(Ann)
-\end{lstlisting}Let’s check and see that this additional information is there.
+idx <-match(ensembl_names, genemap$ensembl_gene_id)data$entrezgene <-genemap$entrezgene [ idx ]data$hgnc_symbol <-genemap$hgnc_symbol [ idx ]Ann <- cbind(rownames(data), data$hgnc_symbol, data$entrezgene)colnames(Ann)<-c("Ensembl", "Symbol", "Entrez")Ann<-as.data.frame(Ann)
+\end{lstlisting}Let’s check and see that this additional information is there.
 \begin{lstlisting}
 head(data)
-\end{lstlisting}
+\end{lstlisting}
 \end{steps}
 %%
 
@@ -468,7 +466,7 @@ Before:
 colSums(data[,1:7])
 After filtering:
 colSums(y$counts)
-\end{lstlisting}\end{steps}
+\end{lstlisting}\end{steps}
 
 
 \begin{steps}
@@ -497,11 +495,11 @@ plotMDS(y)
 \end{figure}
 
 \begin{questions}
-Does the MDS plot indicate a difference in gene expression between the Controls and the DHT treated samples?\begin{answer}
+Does the MDS plot indicate a difference in gene expression between the Controls and the DHT treated samples?\begin{answer}
 The MDS plot shows us that the controls are separated from the DHT treated cells. This indicates that there is a difference in gene expression between the conditions.	
 \end{answer}
 \end{questions}
-We will now estimate the dispersion. We start by estimating the common dispersion. The common dispersion estimates the overall Biological Coefficient of Variation (BCV) of the dataset averaged over all genes. 
+We will now estimate the dispersion. We start by estimating the common dispersion. The common dispersion estimates the overall Biological Coefficient of Variation (BCV) of the dataset averaged over all genes. 
 \begin{steps}
 By using verbose we get the Disp and BCV values printed on the screen
 \begin{lstlisting}
@@ -549,9 +547,9 @@ If we used the common dispersion for these genes instead of the tagwise dispersi
 
 
 \begin{information}
-If we simply used the common dispersion for these genes we would underestimate biological variability, which in turn affects whether these genes would be identified as being differentially expressed between conditions.It is recommended to use the tagwise dispersion, which takes account of gene-to-gene variability.
+If we simply used the common dispersion for these genes we would underestimate biological variability, which in turn affects whether these genes would be identified as being differentially expressed between conditions.It is recommended to use the tagwise dispersion, which takes account of gene-to-gene variability.
 	
-\end{information}Now that we have normalized our data and also calculated the variability of gene expression between samples we are in a position to perform differential expression testing.As this is a simple comparison between two conditions, androgen treatment and placebo treatment we can use the exact test for the negative binomial distribution (Robinson and Smyth, 2008). 
+\end{information}Now that we have normalized our data and also calculated the variability of gene expression between samples we are in a position to perform differential expression testing.As this is a simple comparison between two conditions, androgen treatment and placebo treatment we can use the exact test for the negative binomial distribution (Robinson and Smyth, 2008). 
 
 \subsection{Testing for Differential Expression}
 \begin{steps}
@@ -576,20 +574,20 @@ head(res)
 
 To get a summary of the number of differentially expressed genes we can use the decideTestsDGE function.
 \begin{steps}
-\beging{lstlisting}summary(de <- decideTestsDGE(et))
+\begin{lstlisting}summary(de <- decideTestsDGE(et))
 \end{lstlisting}
 \end{steps}
-This tells us that 2096 genes are downregulated and 2339 genes are upregulated at 5\% FDR.We will now make subsets of the most significant upregulated and downregulated genes.
+This tells us that 2096 genes are downregulated and 2339 genes are upregulated at 5\% FDR.We will now make subsets of the most significant upregulated and downregulated genes.
 
 \begin{steps}
-\begin{lstlisting}alpha=0.05lfc=1.5edgeR_res_sig<-res[res$FDR<alpha,]edgeR_res_sig_lfc <-edgeR_res_sig[abs(edgeR_res_sig$logFC) >= lfc,]head(edgeR_res_sig, n=20)nrow(edgeR_res_sig)nrow(edgeR_res_sig_lfc)
+\begin{lstlisting}alpha=0.05lfc=1.5edgeR_res_sig<-res[res$FDR<alpha,]edgeR_res_sig_lfc <-edgeR_res_sig[abs(edgeR_res_sig$logFC) >= lfc,]head(edgeR_res_sig, n=20)nrow(edgeR_res_sig)nrow(edgeR_res_sig_lfc)
 
 \end{lstlisting}
 \end{steps}
-We can write out these results to our current directory.
+We can write out these results to our current directory.
 \begin{steps}
 \begin{lstlisting}
-write.table(edgeR_res_sig , "edgeR_res_sig.txt", sep="\t", col.names=NA, quote=F)write.table(edgeR_res_sig_lfc , "edgeR_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)
+write.table(edgeR_res_sig , "edgeR_res_sig.txt", sep="\t", col.names=NA, quote=F)write.table(edgeR_res_sig_lfc , "edgeR_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)
 \end{lstlisting}
 
 \end{steps}
@@ -608,38 +606,35 @@ How many upregulated genes and downregulated genes do we have?
 
 \end{questions}
 
-
-
-
 \newpage
-\section{Differential expression using the Voom function and the limma package}We will now do show an alternative approach to differential expression which uses the \textt{limma} package.This is based on linear models. The first step is to create a design matrix. In this case we have a simple design where we have only one condition (treated vs non-treated). However, you may be dealing with more complex experimental designs, for example looking at treatment and other covariates, such as age, gender, batch.
-
+\section{Differential expression using the Voom function and the limma package
+}We will now do show an alternative approach to differential expression which uses the \texttt{limma} package.This is based on linear models. The first step is to create a design matrix. In this case we have a simple design where we have only one condition (treated vs non-treated). However, you may be dealing with more complex experimental designs, for example looking at treatment and other covariates, such as age, gender, batch.
 
 \begin{steps}
 \begin{lstlisting}
-design <-model.matrix(~treatment)check designprint(design)
+design <-model.matrix(~treatment)check designprint(design)
 \end{lstlisting}
 We now use voom to transform the data into a form which is appropriate for linear modeling.
 \begin{lstlisting}
 v <-voom(y, design)
 \end{lstlisting}
-\end{steps}Next we fit linear model to each gene in the dataset using the function lmFit.  Following this we use the function eBayes to test  each gene to find whether foldchange between the conditions being tested is statistically significant.We filter our results by using the same values of alpha (0.05) and log fold change (1.5) used previously.
+\end{steps}Next we fit linear model to each gene in the dataset using the function lmFit.  Following this we use the function eBayes to test  each gene to find whether foldchange between the conditions being tested is statistically significant.We filter our results by using the same values of alpha (0.05) and log fold change (1.5) used previously.
 
 \begin{steps}
 \begin{lstlisting}
-fit_v <-lmFit(v, design) fit_v <- eBayes(fit_v)voom_res<-topTable(fit_v, coef=2,adjust.method="BH", sort.by="P", n=nrow(y$counts)) voom_res_sig <-voom_res[voom_res$adj.P.Val <alpha,]voom_res_sig_lfc <-voom_res_sig[abs(voom_res_sig$logFC) >= lfc,]
+fit_v <-lmFit(v, design) fit_v <- eBayes(fit_v)voom_res<-topTable(fit_v, coef=2,adjust.method="BH", sort.by="P", n=nrow(y$counts)) voom_res_sig <-voom_res[voom_res$adj.P.Val <alpha,]voom_res_sig_lfc <-voom_res_sig[abs(voom_res_sig$logFC) >= lfc,]
 \end{lstlisting}
-\end{steps}How many differentially expressed genes are identified?
+\end{steps}How many differentially expressed genes are identified?
 
 \begin{steps}
-\begin{lstlisting}nrow(voom_res_sig)nrow(voom_res_sig_lfc)
+\begin{lstlisting}nrow(voom_res_sig)nrow(voom_res_sig_lfc)
 \end{lstlisting}
 \end{steps}
-We will write out these results.
+We will write out these results.
 
 \begin{steps}
 \begin{lstlisting}
-write.table(voom_res_sig, "voom_res_sig.txt", sep="\t", col.names=NA, quote=F)write.table(voom_res_sig_lfc, "voom_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)write.table(voom_res, "voom_res.txt", sep="\t", col.names=NA, quote=F) # to be used when background genes are required in downstream analysis
+write.table(voom_res_sig, "voom_res_sig.txt", sep="\t", col.names=NA, quote=F)write.table(voom_res_sig_lfc, "voom_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)write.table(voom_res, "voom_res.txt", sep="\t", col.names=NA, quote=F) # to be used when background genes are required in downstream analysis
 \end{lstlisting}
 \end{steps}
 
@@ -647,7 +642,7 @@ write.table(voom_res_sig, "voom_res_sig.txt", sep="\t", col.names=NA, quote=F)w
 Now let’s visualize some of this data. First we will make a volcano plot using the volcanoplot function available in limma. This creates a plot which displays fold changes versus a measure of statistical significance of the change.
 
 \begin{steps}
-\begin{lstlisting}volcanoplot(fit_v, coef=2, highlight=5)
+\begin{lstlisting}volcanoplot(fit_v, coef=2, highlight=5)
 \end{lstlisting}
 \end{steps}
 
@@ -661,7 +656,7 @@ Now let’s visualize some of this data. First we will make a volcano plot using
 
 Next we will create a heatmap of the top differentially expressed genes. We use the heatmap.2 function available in the gplots package.
 \begin{steps}
-\begin{lstlisting}select_top  <- p.adjust(fit_v$p.value[, 2]) <1e-2Exp_top <- v$E [select_top, ]heatmap.2(Exp_top, scale="row", density.info="none", trace="none", main="Top DEGs", labRow="", cexRow=0.4, cexCol=0.8)
+\begin{lstlisting}select_top  <- p.adjust(fit_v$p.value[, 2]) <1e-2Exp_top <- v$E [select_top, ]heatmap.2(Exp_top, scale="row", density.info="none", trace="none", main="Top DEGs", labRow="", cexRow=0.4, cexCol=0.8)
 \end{lstlisting}
 \end{steps}
 
@@ -690,12 +685,12 @@ Please note that the output files you are creating are saved in your present wor
 \section{Isoform Expression and Transcriptome Assembly}
 
 \begin{information}
-For non-model organisms and genomes with draft assemblies and incomplete annotations, it is a common practice to take and assembly based approach to generate gene structures followed by the quantification step. There are a number of reference based transcript assemblers available that can be used for this purpose such as, cufflinks, stringy. These assemblers can give gene or isoform level assemblies that can be used to perform a gene/isoform level quantification. These assemblers require an alignment of reads with a reference genome or transcriptome as an input. The second optional input is a known gene structure in \textt{GTF} or \text{GFF} format. 
+For non-model organisms and genomes with draft assemblies and incomplete annotations, it is a common practice to take and assembly based approach to generate gene structures followed by the quantification step. There are a number of reference based transcript assemblers available that can be used for this purpose such as, cufflinks, stringy. These assemblers can give gene or isoform level assemblies that can be used to perform a gene/isoform level quantification. These assemblers require an alignment of reads with a reference genome or transcriptome as an input. The second optional input is a known gene structure in \texttt{GTF} or \texttt{GFF} format. 
 \end{information}
 
 There are a number of tools that perform reconstruction of the transcriptome
 and for this workshop we are going to use Cufflinks. Cufflinks can do
-transcriptome assembly either \textit{ab initio} or using a reference annotation. It
+transcriptome assembly either \texttt{ab initio} or using a reference annotation. It
 also quantifies the isoform expression in Fragments
 Per Kilobase of exon per Million fragments mapped (FPKM).
 
@@ -713,7 +708,7 @@ annotation both strictly and as a guide. In the first case Cufflinks will only
 report isoforms that are included in the annotation, while in the latter case
 it will report novel isoforms as well.
 
-The Ensembl annotation for \textit{Danio rerio} is available in
+The Ensembl annotation for \texttt{Danio rerio} is available in
 \texttt{annotation/Danio\_rerio.Zv9.66.gtf}.
 
 \begin{information}
@@ -994,12 +989,7 @@ type 'summary(sigGenes)' on the R prompt to see.
 \end{questions}
 \end{bonus}
 
-
-
-
-
 \newpage
-
 
 \section{References}
 %TODO Change to using BiBTeX
