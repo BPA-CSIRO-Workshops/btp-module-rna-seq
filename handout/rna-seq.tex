@@ -71,14 +71,9 @@ We also have bonus exercises where you can learn to:
 
 The goal of this hands-on session is to perform some basic tasks in the downstream analysis of RNA-seq data.\\
 
- 
-
 First we will use RNA-seq data from zebrafish.  You will align one set of reads to the zebrafish using Tophat2. You will then  view the aligned reads using the IGV viewer. We will also demonstrate how gene counts can be derived from this data.  You will go on to assembly a transcriptome from the read data using cufflinks. We will show you how this type of data may be analysed for differential expression.
-
  
-
 The second part of the tutorial will focus on RNA-seq data from a human experiment (cancer cell line versus normal cells). You will use the Bioconductor packages edgeR and voom (limma) to determine differential gene expression. The results from this analysis will then be used in the final session which introduces you to some of the tools used to gain biological insight into the results of a differential expression analysis
-
 
 \section{Prepare the Environment}
 We will use a dataset derived from sequencing of mRNA from \texttt{Danio rerio} embryos
@@ -451,15 +446,14 @@ Yes. It appears that the Ensembl annotations may have truncated the last exon.
 However, our data also doesn't contain reads that span between the last two
 exons.
 \end{answer}
-
 \end{questions}
 
-
-
 \newpage
+
 \section{Differential Gene Expression Analysis using edgeR}
 
 \subsection{Experiment Design}
+
 The example we are working through today follows a case Study set out in the edgeR Users
 Guide (4.3 Androgen-treated prostate cancer cells (RNA-Seq, two groups) which is based on
 an experiment conducted by Li et al. (2008, Proc Natl Acad Sci USA, 105, 20179-84).
@@ -525,11 +519,11 @@ colnames(data) <-targets$Label
 head(data, n=20)
 \end{lstlisting}
 \end{steps}
-\subsection {Add Gene annotation}
+
+\subsection{Add Gene annotation}
 
 %Add ensemble annotation to the genes
 The data set only includes the Ensembl gene id and the counts. It is useful to have other annotations such as the gene symbol and entrez id. Next we will add in these annotations.  We will use the BiomaRt package to do this.
-
 
 \begin{steps}
 We start by using the useMart function of BiomaRt to access the human data base of ensemble gene ids.  
@@ -565,9 +559,9 @@ Ann<-as.data.frame(Ann)
 head(data)
 \end{lstlisting}
 \end{steps}
-%%
 
 \subsection{Data checks}
+
 Create DGEList object:
 \begin{lstlisting}
 treatment <-factor(c(rep("Control",4), rep("DHT",3)), levels=c("Control", "DHT"))
@@ -756,11 +750,12 @@ How many upregulated genes and downregulated genes do we have?
 2339
 2096
 \end{answer}
-
 \end{questions}
 
 \newpage
+
 \section{Differential expression using the Voom function and the limma package}
+
 We will now show an alternative approach to differential expression which uses the \texttt{limma} package.This is based on linear models. The first step is to create a design matrix. In this case we have a simple design where we have only one condition (treated vs non-treated). However, you may be dealing with more complex experimental designs, for example looking at treatment and other covariates, such as age, gender, batch.
 
 \begin{steps}
@@ -793,7 +788,8 @@ voom_res_sig_lfc <-voom_res_sig[abs(voom_res_sig$logFC) >= lfc,]
 How many differentially expressed genes are identified?
 
 \begin{steps}
-\begin{lstlisting}nrow(voom_res_sig)nrow(voom_res_sig_lfc)
+\begin{lstlisting}
+nrow(voom_res_sig)nrow(voom_res_sig_lfc)
 \end{lstlisting}
 \end{steps}
 We will write out these results.
@@ -821,7 +817,6 @@ volcanoplot(fit_v, coef=2, highlight=5)
 \caption{Volcano Plot}
 \label{fig:Volcano plot}
 \end{figure}
-
 
 Next we will create a heatmap of the top differentially expressed genes. We use the heatmap.2 function available in the gplots package.
 \begin{steps}
@@ -852,8 +847,8 @@ Please note that the output files you are creating are saved in your present wor
 
 % Bonus cufflinks: This will be run only for the longer workshops. Skip for 2day format. Users can try the commands at home.
 
-
 \begin{bonus}
+
 \section{Differential Expression using cuffdiff}
 
 \begin{warning}
@@ -898,6 +893,7 @@ Some of the Cufflinks options that we will use to run the program are:
  was NOT strand specific.
   \item[-C] Biological replicates and multiple group contrast can be defined here 
 \end{description}
+
 \end{information}
 
 \begin{steps}
@@ -1014,7 +1010,6 @@ dev.off()
 \end{lstlisting}
 \end{steps}
 
-
 \begin{questions}
 What options would you use to draw a density or boxplot for different replicates if available ? 
 (Hint: look at the manual at Bioconductor website)
@@ -1024,17 +1019,21 @@ densRep<-csDensity(genes(cuff),replicates=T)
 brep<-csBoxplot(genes(cuff),replicates=T)
 \end{lstlisting}
 \end{answer}
+\end{questions}
+
+\begin{questions}
 How many differentially expressed genes did you observe?
+
 \begin{answer}
 type 'summary(sigGenes)' on the R prompt to see.
 \end{answer}
 \end{questions}
+
 \end{bonus}
 
 \newpage
 
 \section{References}
-%TODO Change to using BiBTeX
 \begin{enumerate}
   \item Trapnell, C., Pachter, L. \& Salzberg, S. L. TopHat: discovering splice
   junctions with RNA-Seq. Bioinformatics 25, 1105-1111 (2009).
