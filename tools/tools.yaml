@@ -1,6 +1,37 @@
+<<<<<<< HEAD
 # YAML comments start with a hash and continue to the end of the line
 btp::analysis_tools:                                                 # Always start with this line
   fastqc_0.11.2-0_amd64.deb:                                         # The Debian package filename of a tool required by the module
     source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'  # The URL location of where the above named file can be obtained
     provider: 'dpkg'                                                 # How the above file is to be processed by the deployment backend
 # Repeat lines 3-5 for each tool required by the module
+=======
+btp::analysis_tools:
+  tophat2_2.0.13-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  cufflinks_2.2.1-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  samtools_0.1.18-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  bedtools_2.22.1-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  ucsctools_310-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  igv_2.3.59-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  igvtools_2.3.59-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  rbase_3.2.5-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+  subread_1.4.6-p3-0_amd64.deb:
+    source: 'https://swift.rc.nectar.org.au:8888/v1/AUTH_809/Tools'
+    provider: 'dpkg'
+>>>>>>> 88d9b137b855fe708ca2bad82fb71452ed75d622

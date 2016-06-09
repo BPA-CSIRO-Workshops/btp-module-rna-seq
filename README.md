@@ -30,6 +30,27 @@ the following 4 major elements:
  * **[Tools](tools)** - This describes which tools are used in the handout exercises and how to install them.
  * **[Presentations](presentations)** - This is where you will find presentations for introducing concepts that are
    explored in the handout exercises.
+=======
+# btp-module-rna-seq
+Bioinformatics Training Platform (BTP) Module: RNA-Seq
+
+  * Topic
+    * RNA-Seq
+  * Target Audience
+    * Biologists
+	* Non-bioinformaticians
+	* Little to no programming expereience
+  * Prerequisites
+    * None
+  * Key Learning Outcomes
+    * Understand and perform a simple RNA-Seq analysis workflow.
+    * Perform spliced alignments to an indexed reference genome using TopHat.
+    * Perform transcript assembly using Cufflinks.
+    * Visualize transcript alignments and annotation in a genome browser such as IGV.
+    * Be able to identify differential gene expression between two experimental conditions.
+    * Be familiar with R environment and be able to run R based RNA-seq packages.
+  * Time Required
+    * 6 hrs
 
 License
 =======
