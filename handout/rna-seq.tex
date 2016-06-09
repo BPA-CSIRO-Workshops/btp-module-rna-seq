@@ -28,7 +28,7 @@ After completing this practical the trainee should be able to:
   \item Be familiar with R environment and be able to run R based RNA-seq packages.
 \end{itemize}
 
-We also have bonus exercises on where you can learn to:
+We also have bonus exercises where you can learn to:
 \begin{itemize}
   \item Perform transcript assembly using Cufflinks.
   \item Run cuffdiff, a Cufflinks utility for differential expression analysis.
@@ -315,7 +315,7 @@ In RNAseq experiments the digital gene expression is recorded as the gene counts
 %%%%% TEST THIS SECTION
 \begin{steps}
 \begin{lstlisting}[style=command_syntax]
-featureCounts -a Danio_rerio.Zv9.66.gtf -t exon -g gene_id -o gene_counts.txt tophat/ZV9_6h/accepted_hits.sorted.bam tophat/ZV9_6h/accepted_hits.sorted.bam
+featureCounts -a Danio_rerio.Zv9.66.gtf -t exon -g gene_id -o gene_counts.txt tophat/ZV9_6h/accepted_hits.sorted.bam tophat/ZV9_2cells/accepted_hits.sorted.bam
 \end{lstlisting}
 \end{steps}
 
@@ -857,7 +857,7 @@ Please note that the output files you are creating are saved in your present wor
 \section{Differential Expression using cuffdiff}
 
 \begin{warning}
-This is optional exercise and will be run if time allows. 	
+This is optional exercise and will be run if time permits. 
 \end{warning}
 
 One of the stand-alone tools that perform differential expression analysis is
