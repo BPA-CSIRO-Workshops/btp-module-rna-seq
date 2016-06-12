@@ -734,7 +734,8 @@ edgeR_res_sig_lfc <-edgeR_res_sig[abs(edgeR_res_sig$logFC) >= lfc,]head(edgeR_re
 We can write out these results to our current directory.
 \begin{steps}
 \begin{lstlisting}
-write.table(edgeR_res_sig , "edgeR_res_sig.txt", sep="\t", col.names=NA, quote=F)write.table(edgeR_res_sig_lfc , "edgeR_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)
+write.table(edgeR_res_sig , "edgeR_res_sig.txt", sep="\t", col.names=NA, quote=F)
+write.table(edgeR_res_sig_lfc , "edgeR_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)
 \end{lstlisting}
 
 \end{steps}
@@ -821,7 +822,8 @@ volcanoplot(fit_v, coef=2, highlight=5)
 Next we will create a heatmap of the top differentially expressed genes. We use the heatmap.2 function available in the gplots package.
 \begin{steps}
 \begin{lstlisting}
-select_top  <- p.adjust(fit_v$p.value[, 2]) <1e-2Exp_top <- v$E [select_top, ]
+select_top  <- p.adjust(fit_v$p.value[, 2]) <1e-2
+Exp_top <- v$E [select_top, ]
 heatmap.2(Exp_top, scale="row", density.info="none", trace="none", main="Top DEGs", labRow="", cexRow=0.4, cexCol=0.8)
 \end{lstlisting}
 \end{steps}
