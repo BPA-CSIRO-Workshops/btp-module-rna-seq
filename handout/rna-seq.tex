@@ -307,9 +307,8 @@ Load the sorted BAM file into IGV, as described previously, and rename the track
 
 In RNAseq experiments the digital gene expression is recorded as the gene counts or number of reads aligning to a known gene feature. If you have a well annotated genome, you can use the gene structure file in a standard gene annotation format (GTF or GFF)) along with the spliced alignment file to quantify the known genes. We will demonstrate a utility called \texttt{FeatureCounts} that comes with the \texttt{Subread} package. 
 
-%%%%% TEST THIS SECTION
 \begin{steps}
-\begin{lstlisting}[style=command_syntax]
+\begin{lstlisting}
 mkdir gene_counts
 featureCounts -a annotation/Danio_rerio.Zv9.66.gtf -t exon -g gene_id -o gene_counts/gene_counts.txt tophat/ZV9_6h/accepted_hits.sorted.bam tophat/ZV9_2cells/accepted_hits.sorted.bam
 \end{lstlisting}
