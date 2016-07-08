@@ -40,13 +40,13 @@ We also have bonus exercises where you can learn to:
 \subsection{Tools Used}
 \begin{description}[style=multiline,labelindent=0cm,align=left,leftmargin=1cm]
   \item[Tophat] \hfill\\
-    \url{https://ccb.jhu.edu/software/tophat/index.shtml/}
+    \url{https://ccb.jhu.edu/software/tophat/index.shtml}
   \item[Cufflinks] \hfill\\
     \url{http://cole-trapnell-lab.github.io/cufflinks/}
   \item[Samtools] \hfill\\
-    \url{http://samtools.sourceforge.net/}
+    \url{http://www.htslib.org/}
   \item[BEDTools] \hfill\\
-    \url{http://code.google.com/p/bedtools/}
+    \url{https://github.com/arq5x/bedtools2}
   \item[UCSC tools] \hfill\\
     \url{http://hgdownload.cse.ucsc.edu/admin/exe/}
   \item[IGV] \hfill\\
@@ -54,7 +54,7 @@ We also have bonus exercises where you can learn to:
   \item[FeatureCount] \hfill\\
     \url{http://subread.sourceforge.net/}
   \item[edgeR pakcage] \hfill\\
-    \url{http://http://www.bioconductor.org/packages/release/bioc/html/edgeR.html/}
+    \url{https://bioconductor.org/packages/release/bioc/html/edgeR.html}
   \item[CummeRbund manual] \hfill\\
     \url{http://www.bioconductor.org/packages/release/bioc/vignettes/cummeRbund/inst/doc/cummeRbund-manual.pdf}
 \end{description}
@@ -103,7 +103,7 @@ cd /home/trainee/rnaseq/
 %\textcolor{red}{
 \begin{warning}
   All commands entered into the terminal for this tutorial should be from within the
-  \textbf{\texttt{$\sim$/rnaseq}} directory.
+  \textbf{\texttt{/home/trainee/rnaseq}} directory.
 \end{warning}
 
 \begin{steps}
@@ -310,7 +310,8 @@ In RNAseq experiments the digital gene expression is recorded as the gene counts
 %%%%% TEST THIS SECTION
 \begin{steps}
 \begin{lstlisting}[style=command_syntax]
-featureCounts -a Danio_rerio.Zv9.66.gtf -t exon -g gene_id -o gene_counts.txt tophat/ZV9_6h/accepted_hits.sorted.bam tophat/ZV9_2cells/accepted_hits.sorted.bam
+mkdir gene_counts
+featureCounts -a annotation/Danio_rerio.Zv9.66.gtf -t exon -g gene_id -o gene_counts/gene_counts.txt tophat/ZV9_6h/accepted_hits.sorted.bam tophat/ZV9_2cells/accepted_hits.sorted.bam
 \end{lstlisting}
 \end{steps}
 
@@ -397,7 +398,7 @@ Cufflinks generates several files in the specified output directory. Here's a sh
 The complete documentation can be found at:
 
 %%% Make sure the URL is current
-\url{http://cufflinks.cbcb.umd.edu/manual.html#cufflinks_output}
+\url{http://cole-trapnell-lab.github.io/cufflinks/file_formats/#output-formats-used-in-the-cufflinks-suite}
 \end{information}
 
 \begin{information}
