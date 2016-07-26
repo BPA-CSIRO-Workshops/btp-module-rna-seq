@@ -1,0 +1,128 @@
+
+getwd()
+
+library("edgeR")
+library("gplots")
+library("limma")
+library("RColorBrewer")
+library("org.Hs.eg.db")
+library("biomaRt")
+
+
+data <- read.delim("pnas_expression.txt", row.names=1, header=T)
+targets <- read.delim("Targets.txt", header=T)
+
+colnames(data) <-targets$Label
+head(data, n=20)
+
+###If ensembl connection is working use the following block of text. If not use the prepared annotation file Ann.txt
+
+listMarts(host="www.ensembl.org")
+human<-useMart(host="www.ensembl.org", "ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") 
+attributes=c("ensembl_gene_id", "entrezgene","hgnc_symbol")
+ensembl_names<-rownames(data)
+head(ensembl_names)
+genemap<-getBM(attributes, filters="ensembl_gene_id", values=ensembl_names, mart=human)
+head(genemap)
+idx <-match(ensembl_names, genemap$ensembl_gene_id)
+data$entrezgene <-genemap$entrezgene [ idx ]
+data$hgnc_symbol <-genemap$hgnc_symbol [ idx ]
+Ann <- cbind(rownames(data), data$hgnc_symbol, data$entrezgene)
+colnames(Ann)<-c("Ensembl", "Symbol", "Entrez")
+Ann<-as.data.frame(Ann)
+head(data)
+
+### if the above doesn't work
+
+data <- read.delim("pnas_expression.txt", row.names=1, header=T)
+targets <- read.delim("Targets.txt", header=T)
+Ann<-read.delim("Annot.txt", row.names=1,header=T)
+colnames(data) <-targets$Label
+head(data, n=20) #check order of data and Annotation is the same
+head(Ann, n=20)
+
+###
+
+treatment <-factor(c(rep("Control",4), rep("DHT",3)), levels=c("Control", "DHT"))
+
+y <-DGEList(counts=data[,1:7], group=treatment, genes=Ann)
+
+dim(y)
+head(y$genes)
+
+keep <-rowSums( cpm(y)>1) >=3
+y <-y[keep, keep.lib.size =FALSE]
+dim(y)
+dim(data[,1:7])
+
+colSums(data[,1:7])
+colSums(y$counts)
+
+y <- calcNormFactors(y)
+y$samples
+
+plotMDS(y, col=as.numeric(y$samples$group))
+
+y <- estimateCommonDisp(y, verbose=T)
+y <- estimateTagwiseDisp(y) 
+plotBCV(y)
+et <- exactTest(y)
+res <- topTags(et, n=nrow(y$counts), adjust.method="BH")$table
+head(res)
+summary(de <- decideTestsDGE(et))
+
+alpha=0.05
+lfc=1.5
+edgeR_res_sig<-res[res$FDR<alpha,]
+edgeR_res_sig_lfc <-edgeR_res_sig[abs(edgeR_res_sig$logFC) >= lfc,]
+head(edgeR_res_sig, n=20)
+nrow(edgeR_res_sig)
+nrow(edgeR_res_sig_lfc)
+
+write.table(edgeR_res_sig , "edgeR_res_sig.txt", sep="\t", col.names=NA, quote=F)
+write.table(edgeR_res_sig_lfc , "edgeR_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)
+
+design <-model.matrix(~treatment)
+print(design)
+v <-voom(y, design)
+fit_v <-lmFit(v, design) 
+fit_v <- eBayes(fit_v)
+
+voom_res<-topTable(fit_v, coef=2,adjust.method="BH", sort.by="P", n=nrow(y$counts)) 
+voom_res_sig <-voom_res[voom_res$adj.P.Val <alpha,]
+voom_res_sig_lfc <-voom_res_sig[abs(voom_res_sig$logFC) >= lfc,]
+
+nrow(voom_res_sig)
+nrow(voom_res_sig_lfc)
+
+write.table(voom_res_sig, "voom_res_sig.txt", sep="\t", col.names=NA, quote=F)
+write.table(voom_res_sig_lfc, "voom_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)
+write.table(voom_res, "voom_res.txt", sep="\t", col.names=NA, quote=F) # to be used when background genes are required in downstream analysis
+
+volcanoplot(fit_v, coef=2, highlight=5)
+head(fit_v$p.value)
+select_top  <- p.adjust(fit_v$p.value[, 2]) <1e-2
+Exp_top <- v$E [select_top, ]
+nrow(Exp_top)
+heatmap<-heatmap.2(Exp_top, scale="row", density.info="none", trace="none", main="Top DEGs", labRow="", cexRow=0.4, cexCol=0.8)
+
+### Gene ontology analysis using goana
+head(fit_v$genes)
+fit_v$design
+
+
+DE_GOana<-goana(fit_v, coef=2, geneid=fit_v$genes$Entrez, FDR=0.05, species = "Hs", trend=F, plot=F ) 
+
+DE_GOana_top_BP_down<- topGO(DE_GOana, ontology=c("BP"), sort = "down", number=150L, truncate.term=50)
+head(DE_GOana_top_BP_down, 10)
+
+DE_GOana_top_BP_up<- topGO(DE_GOana, ontology=c("BP"), sort = "up", number=150L, truncate.term=50)
+head(DE_GOana_top_BP_up, 10)
+
+DE_GOana_top_BP<- topGO(DE_GOana, ontology=c("BP"), number=150L, truncate.term=50)
+head(DE_GOana_top_BP, 10)
+
+
+
+
+

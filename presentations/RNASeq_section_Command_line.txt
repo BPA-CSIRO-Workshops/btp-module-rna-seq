@@ -1,0 +1,66 @@
+############# PREPARING THE ENVIRONMENT #############
+cd ~/rnaseq
+ls data
+############# ALIGNMENT #############
+head -n 20 data/2cells_1.fastq
+tophat --solexa-quals -g 2 --library-type fr-unstranded -j annotation/Danio_rerio.Zv9.66.spliceSites -o tophat/ZV9_6h genome/ZV9 data/6h_1.fastq data/6h_2.fast
+samtools sort tophat/ZV9_6h/accepted_hits.bam tophat/ZV9_6h/accepted_hits.sorted
+samtools index tophat/ZV9_6h/accepted_hits.sorted.bam
+############# ISOFORM EXPRESSION  #############
+cufflinks --help
+cufflinks -o cufflinks/ZV9_2cells_gtf -G annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_2cells/accepted_hits.bam
+cufflinks -o cufflinks/ZV9_6h_gtf -G annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_6h/accepted_hits.bam
+############# DIFFERENTIAL EXPRESSION  #############
+cuffdiff -o cuffdiff/ -L ZV9_2cells,ZV9_6h -T -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded annotation/Danio_rerio.Zv9.66.gtf tophat/ZV9_2cells/accepted_hits.bam tophat/ZV9_6h/accepted_hits.bam
+head -n 20 cuffdiff/gene_exp.diff
+sort -t$'\t' -g -k 13 cuffdiff/gene_exp.diff > cuffdiff/gene_exp_qval.sorted.diff
+head -n 20 cuffdiff/gene_exp_qval.sorted.diff
+############# VISUALIZING CUFFDIFF  #############
+cd ~/rnaseq/cuffdiff
+cp ~/rnaseq/annotation/Danio_rerio.Zv9.66.gtf ~/rnaseq/cuffdiff
+ls -l
+R
+############# in R  #############
+library(cummeRbund)
+cuff<-readCufflinks(dir="/home/trainee/Desktop/rnaseq/cuffdiff", gtfFile='Danio_rerio.Zv9.66.gtf',genome="Zv9", rebuild=T)
+pdf(file = "SCV.pdf", height = 6, width = 6)
+dens<-csDensity(genes(cuff))
+dens
+dev.off()
+pdf(file = "BoxP.pdf", height = 6, width = 6)
+b<-csBoxplot(genes(cuff))
+b
+dev.off()
+sigGeneIds<-getSig(cuff,alpha=0.05,level="genes")
+head(sigGeneIds)
+sigGenes<-getGenes(cuff,sigGeneIds)
+sigGenes
+head(fpkm(sigGenes))
+head(fpkm(isoforms(sigGenes)))
+pdf(file = "heatmap.pdf", height = 6, width = 6)
+h<-csHeatmap(sigGenes,cluster="both")
+h
+dev.off()
+############# FUNCTIONAL ANNOTATION  #############
+############# IN THE SHELL  #############
+cd ~/rnaseq/edgeR
+R
+############# back in R  #############
+library(edgeR)
+library(biomaRt)
+library(gplots)
+data <- read.delim("pnas_expression.txt", row.names=1, header=T)
+targets <- read.delim("Targets.txt", header=T)
+y <- DGEList(counts=data[,1:7], group=targets$Treatment)
+colnames(y) <- targets$Label
+dim(y)
+keep <-rowSums( cpm(y)>1) >=3
+y <- y[keep, ]
+y<-calcNormFactors(y)
+y$samples
+plotMDS(y)
+y <- estimateCommonDisp(y)
+y <- estimateTagwiseDisp(y)
+plotBCV(y)
+et <- exactTest(y)
+res <- topTags(et, n=nrow(y$counts), adjust.method="BH")$table
