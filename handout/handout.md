@@ -599,7 +599,7 @@ should produce a plot as shown in Figure 4):
 
     plotMDS(y, col=as.numeric(y$samples$group))
 
-[H] ![image](handout/MDS.png) [fig:MDS plot]
+[H] ![image](MDS.png) [fig:MDS plot]
 
 Does the MDS plot indicate a difference in gene expression between the
 Controls and the DHT treated samples?
@@ -627,7 +627,7 @@ should obtain a plot as shown in the Figure 5):
 
     plotBCV(y)
 
-[H] ![image](handout/BCV.png) [fig:BCV plot]
+[H] ![image](BCV.png) [fig:BCV plot]
 
 We see here that the common dispersion estimates the overall Biological
 Coefficient of Variation (BCV) of the dataset averaged over all genes.
@@ -754,7 +754,7 @@ significance of the change.
 
     volcanoplot(fit_v, coef=2, highlight=5)
 
-[H] ![image](handout/Volcano.png) [fig:Volcano plot]
+[H] ![image](Volcano.png) [fig:Volcano plot]
 
 Next we will create a heatmap of the top differentially expressed genes.
 We use the heatmap.2 function available in the gplots package.
@@ -763,7 +763,7 @@ We use the heatmap.2 function available in the gplots package.
     Exp_top <- v$E [select_top, ]
     heatmap.2(Exp_top, scale="row", density.info="none", trace="none", main="Top DEGs", labRow="", cexRow=0.4, cexCol=0.8)
 
-[H] ![image](handout/Heatmap.png) [fig:Heatmap]
+[H] ![image](Heatmap.png) [fig:Heatmap]
 
 You can now quit the R prompt
 
