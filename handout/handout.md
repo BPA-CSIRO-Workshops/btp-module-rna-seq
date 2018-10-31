@@ -14,14 +14,11 @@ After completing this practical the trainee should be able to:
 -   Be able to identify differential gene expression between two
     experimental conditions.
 
--   Be familiar with R environment and be able to run R based RNA-seq
-    packages.
 
 We also have bonus exercises where you can learn to:
 
--   Perform transcript assembly using Cufflinks.
+-   Perform transcript assembly using Stringtie.
 
--   Run cuffdiff, a Cufflinks utility for differential expression
     analysis.
 
 -   Visualize transcript alignments and annotation in a genome browser
@@ -36,9 +33,9 @@ Tophat
 :   \
     <https://ccb.jhu.edu/software/tophat/index.shtml>
 
-Cufflinks
+Stringtie
 :   \
-    <http://cole-trapnell-lab.github.io/cufflinks/>
+    <http://https://ccb.jhu.edu/software/stringtie/>
 
 Samtools
 :   \
@@ -64,9 +61,6 @@ edgeR pakcage
 :   \
     <https://bioconductor.org/packages/release/bioc/html/edgeR.html>
 
-CummeRbund manual
-:   \
-    <http://www.bioconductor.org/packages/release/bioc/vignettes/cummeRbund/inst/doc/cummeRbund-manual.pdf>
 
 ### Sources of Data
 
@@ -320,113 +314,112 @@ For non-model organisms and genomes with draft assemblies and incomplete
 annotations, it is a common practice to take and assembly based approach
 to generate gene structures followed by the quantification step. There
 are a number of reference based transcript assemblers available that can
-be used for this purpose such as, cufflinks, stringy. These assemblers
+be used for this purpose such as, cufflinks, stringtie. These assemblers
 can give gene or isoform level assemblies that can be used to perform a
 gene/isoform level quantification. These assemblers require an alignment
 of reads with a reference genome or transcriptome as an input. The
 second optional input is a known gene structure in `GTF` or `GFF`
 format.
 
-There are a number of tools that perform reconstruction of the
-transcriptome and for this workshop we are going to use Cufflinks.
-Cufflinks can do transcriptome assembly either `ab initio` or using a
-reference annotation. It also quantifies the isoform expression in
-Fragments Per Kilobase of exon per Million fragments mapped (FPKM).
+These gene annotation files contain information of known genes and may be helpful in reconstruction of transcripts that are of low abundance on your sample. StringTie will also assemble and construct a transcriptome containing any unannotated genes. Furthermore, its output data is able to directly be utilised in differential expression resources such as Cuffdiff, Ballgown or other packers in R (edgeR, DESeq2).
 
-Cufflinks has a number of parameters in order to perform transcriptome
+To run string tie, the basic command is:
+
+
+Stringtie has a number of parameters in order to perform transcriptome
 assembly and quantification. To view them all type:
 
-    cufflinks --help
+    stringtie --help
 
 We aim to reconstruct the transcriptome for both samples by using the
-Ensembl annotation both strictly and as a guide. In the first case
-Cufflinks will only report isoforms that are included in the annotation,
-while in the latter case it will report novel isoforms as well.
+Ensembl annotation as a guide. 
 
 The Ensembl annotation for `Danio rerio` is available in
 `annotation/Danio_rerio.Zv9.66.gtf`.
 
-The general format of the `cufflinks` command is:
+The general format of the `stringtie` command is:
 
-    cufflinks [options]* <aligned_reads.(sam|bam)>
+    stringtie <aligned_reads_file.bam> [options]
 
 Where the input is the aligned reads (either in SAM or BAM format).
-
-Some of the available parameters for Cufflinks that we are going to use
-to run Cufflinks are listed below:
-
--o
-:   Output directory.
-
--G
-:   Tells Cufflinks to use the supplied GTF annotations strictly in
-    order to estimate isoform annotation.
-
--b
-:   Instructs Cufflinks to run a bias detection and correction algorithm
-    which can significantly improve accuracy of transcript abundance
-    estimates. To do this Cufflinks requires a multi-fasta file with the
-    genomic sequences against which we have aligned the reads.
-
--u
-:   Tells Cufflinks to do an initial estimation procedure to more
-    accurately weight reads mapping to multiple locations in the genome
-    (multi-hits).
-
-–library-type
-:   Before performing any type of RNA-seq analysis you need to know a
-    few things about the library preparation. Was it done using a
-    strand-specific protocol or not? If yes, which strand? In our data
-    the protocol was NOT strand specific.
 
 Perform transcriptome assembly, strictly using the supplied GTF
 annotations, for the `2cells` and `6h` data using cufflinks:
 
-    # 2cells data (takes approx. 5mins):
-    cufflinks -o cufflinks/ZV9_2cells_gtf -G annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_2cells/accepted_hits.bam
-    # 6h data (takes approx. 5mins):
-    cufflinks -o cufflinks/ZV9_6h_gtf -G annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_6h/accepted_hits.bam
+For instance, to run StringTie on 2cells BAM file:
 
-Cufflinks generates several files in the specified output directory.
-Here’s a short description of these files:
+    stringtie -p 8 -G annotation/Danio_rerio.Zv9.66.gtf -o stringtie/ZV9_2cells.gft tophat/ZV9_2cells/accepted_hits.sorted.bam
 
-genes.fpkm\_tracking
-:   Contains the estimated gene-level expression values.
+ 
 
-isoforms.fpkm\_tracking
-:   Contains the estimated isoform-level expression values.
+Repeat this command on the 6h BAM file:
 
-skipped.gtf
-:   Contains loci skipped as a result of exceeding the maximum number of
-    fragments.
+    stringtie -p 8 -G annotation/Danio_rerio.Zv9.66.gtf -o stringtie/ZV9_6h.gft tophat/ZV9_6h/accepted_hits.sorted.bam
 
-transcripts.gtf
-:   This GTF file contains Cufflinks’ assembled isoforms.
+:	-p = number of processing threads
 
-The complete documentation can be found at:
+:	-G = reference annotation file
 
-<http://cole-trapnell-lab.github.io/cufflinks/file_formats/#output-formats-used-in-the-cufflinks-suite>
+:	-o = output file location and name.
 
-So far we have forced cufflinks, by using the `-G` option, to strictly
-use the GTF annotations provided and thus novel transcripts will not be
-reported. We can get cufflinks to perform a GTF-guided transcriptome
-assembly by using the `-g` option instead. Thus, novel transcripts will
-be reported.
+ 
 
-GTF-guided transcriptome assembly is more computationally intensive than
-strictly using the GTF annotations. Therefore, we have pre-computed
-these GTF-guided assemblies for you and have placed the results under
-subdirectories:
+Most RNA sequencing experiments will have multiple samples. As such, Stringtie has a function to merge all transcripts assembled across the samples, which enables inter-sample comparisons to be made. It does this by first assembling all transcripts within each sample, merging the the transcripts and re-running the assembly based off a merged list of genes.
 
-`cufflinks/ZV9_2cells_gtf_guided` and `cufflinks/ZV9_6h_gft_guided`.
+ 
 
-You DO NOT need to run these commands. We provide them so you know how
-we generated the the GTF-guided transcriptome assemblies:
+Prior to running a merge function within stringtie:
+We need to create a mergelist.txt file before utilising the merge function. This is a list of all .gtf files created by stringtie in the above step and can be made in a text editor such as vi or nano. For this exercise, there is a file pre-made for you. The txt file will direct the merge function to look for the names of all the .gtf files that we want to merge.
 
-    # 2cells guided transcriptome assembly (takes approx. 30mins):
-    cufflinks -o cufflinks/ZV9_2cells_gtf_guided -g annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_2cells/accepted_hits.bam
-    # 6h guided transcriptome assembly (takes approx. 30mins):
-    cufflinks -o cufflinks/ZV9_6h_gtf_guided -g annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_6h/accepted_hits.bam
+ 
+
+To merge StringTie files
+
+    stringtie --merge -p 8 -G annotation/Danio_rerio.Zv9.66.gtf -o stringtie/stringtie_merged.gtf stringtie/mergelist.txt
+
+(mergelist.txt is a text file that will have a list of all .gtf generated by stringtie in the above steps)
+
+Note how a reference gene annotation (Danio_rerio.Zv9.66.gtf) is utilised in this case. This makes use of information we already have in order to assemble the transcriptome of our RNA seq data.
+
+ 
+
+The next step is an optional step to see how your merged annotation compares to reference gene annotation provided. gffcompare is a tool that determines how many of your annotations match the reference (either fully or partial) and how many were completely novel. The output of this ulitily gives you:
+
+Sensitivity is defined as the proportion of genes from the annotation that are correctly reconstructed
+Precision (also known as positive predictive value) captures the proportion of the output that overlaps the annotation
+To compare how merged annotation compares to reference
+
+    gffcompare -G -r annotation/Danio_rerio.Zv9.66.gtf stringtie/stringtie_merged.gtf
+
+:	-r = reference genome in form of gtf
+
+:	-G = tells gffcompare to compare all transcripts in the input file (stringtie/stringtie_merged.gtf), even those that might be redundant
+
+:	-o = all output of gffcompare has a gffcmp. prefix, unless otherwise defined by user
+
+  
+
+Now that we are happy with our merged annotation, we need to estimate the abundance of each transcript within each sample. Stringtie is designed to create output files that are immediately usable in next step of our RNA sequencing pipeline. In this next example, we can direct stringtie to simultaneously create a .ctab file required for ballgown.
+
+ 
+To estimate abundances and create table counts for 2cell 
+
+    stringtie -e -B -p 8 -G stringtie/stringtie_merged.gtf -0 ballgown/ZV9_6h.gtf tophat/ZV9_6h/accepted_hits.sorted.bam
+
+To estimate abundances and create table counts for 2cell 
+
+    stringtie -e -B -p 8 -G stringtie/stringtie_merged.gtf -0 ballgown/ZV9_2cells.gtf tophat/ZV9_2cells/accepted_hits.sorted.bam
+
+:	-e = limits the processing of read alignments to only estimate and output the assembled transcripts matching the reference transcripts (given by -G). Reads with no reference transcripts will be entirely skipped
+
+:	-B = enables output of Ballgown input table files (*.ctab) containing coverage data for the reference transcripts given with the -G option. If -o is used,  StringTie will write the *.ctab files in the same directory as the output GTF.      
+
+:	-p = refers to number of processing threads
+
+:	-G = refers to a reference annotation (in GTF or GFF format)
+
+Visulaizing transcript assembly
+-------------------------------
 
 1.  Go back to IGV and load the pre-computed, GTF-guided transcriptome
     assembly for the `2cells` data
