@@ -24,6 +24,13 @@ We also have bonus exercises where you can learn to:
 -   Visualize transcript alignments and annotation in a genome browser
     such as IGV.
 
+
+## Author Information
+
+*Primary Author(s):*
+Sonika Tyagi sonika.tyagi@monash.edu \
+Susan Corley UNSW\
+
 Resources You’ll be Using
 -------------------------
 
