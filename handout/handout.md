@@ -30,35 +30,35 @@ Resources You’ll be Using
 ### Tools Used
 
 Tophat
-:   \
+:   
     <https://ccb.jhu.edu/software/tophat/index.shtml>
 
 Stringtie
-:   \
+:   
     <http://https://ccb.jhu.edu/software/stringtie/>
 
 Samtools
-:   \
+:   
     <http://www.htslib.org/>
 
 BEDTools
-:   \
+:   
     <https://github.com/arq5x/bedtools2>
 
 UCSC tools
-:   \
+:   
     <http://hgdownload.cse.ucsc.edu/admin/exe/>
 
 IGV
-:   \
+:   
     <http://www.broadinstitute.org/igv/>
 
 FeatureCount
-:   \
+:   
     <http://subread.sourceforge.net/>
 
 edgeR pakcage
-:   \
+:   
     <https://bioconductor.org/packages/release/bioc/html/edgeR.html>
 
 
