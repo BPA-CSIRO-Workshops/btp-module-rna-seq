@@ -14,18 +14,22 @@ After completing this practical the trainee should be able to:
 -   Be able to identify differential gene expression between two
     experimental conditions.
 
--   Be familiar with R environment and be able to run R based RNA-seq
-    packages.
 
 We also have bonus exercises where you can learn to:
 
--   Perform transcript assembly using Cufflinks.
+-   Perform transcript assembly using Stringtie.
 
--   Run cuffdiff, a Cufflinks utility for differential expression
     analysis.
 
 -   Visualize transcript alignments and annotation in a genome browser
     such as IGV.
+
+
+## Author Information
+
+*Primary Author(s):*
+Sonika Tyagi sonika.tyagi@monash.edu \
+Susan Corley UNSW\
 
 Resources You’ll be Using
 -------------------------
@@ -33,40 +37,37 @@ Resources You’ll be Using
 ### Tools Used
 
 Tophat
-:   \
+:   
     <https://ccb.jhu.edu/software/tophat/index.shtml>
 
-Cufflinks
-:   \
-    <http://cole-trapnell-lab.github.io/cufflinks/>
+Stringtie
+:   
+    <http://https://ccb.jhu.edu/software/stringtie/>
 
 Samtools
-:   \
+:   
     <http://www.htslib.org/>
 
 BEDTools
-:   \
+:   
     <https://github.com/arq5x/bedtools2>
 
 UCSC tools
-:   \
+:   
     <http://hgdownload.cse.ucsc.edu/admin/exe/>
 
 IGV
-:   \
+:   
     <http://www.broadinstitute.org/igv/>
 
 FeatureCount
-:   \
+:   
     <http://subread.sourceforge.net/>
 
 edgeR pakcage
-:   \
+:   
     <https://bioconductor.org/packages/release/bioc/html/edgeR.html>
 
-CummeRbund manual
-:   \
-    <http://www.bioconductor.org/packages/release/bioc/vignettes/cummeRbund/inst/doc/cummeRbund-manual.pdf>
 
 ### Sources of Data
 
@@ -320,113 +321,112 @@ For non-model organisms and genomes with draft assemblies and incomplete
 annotations, it is a common practice to take and assembly based approach
 to generate gene structures followed by the quantification step. There
 are a number of reference based transcript assemblers available that can
-be used for this purpose such as, cufflinks, stringy. These assemblers
+be used for this purpose such as, cufflinks, stringtie. These assemblers
 can give gene or isoform level assemblies that can be used to perform a
 gene/isoform level quantification. These assemblers require an alignment
 of reads with a reference genome or transcriptome as an input. The
 second optional input is a known gene structure in `GTF` or `GFF`
 format.
 
-There are a number of tools that perform reconstruction of the
-transcriptome and for this workshop we are going to use Cufflinks.
-Cufflinks can do transcriptome assembly either `ab initio` or using a
-reference annotation. It also quantifies the isoform expression in
-Fragments Per Kilobase of exon per Million fragments mapped (FPKM).
+These gene annotation files contain information of known genes and may be helpful in reconstruction of transcripts that are of low abundance on your sample. StringTie will also assemble and construct a transcriptome containing any unannotated genes. Furthermore, its output data is able to directly be utilised in differential expression resources such as Cuffdiff, Ballgown or other packers in R (edgeR, DESeq2).
 
-Cufflinks has a number of parameters in order to perform transcriptome
+To run string tie, the basic command is:
+
+
+Stringtie has a number of parameters in order to perform transcriptome
 assembly and quantification. To view them all type:
 
-    cufflinks --help
+    stringtie --help
 
 We aim to reconstruct the transcriptome for both samples by using the
-Ensembl annotation both strictly and as a guide. In the first case
-Cufflinks will only report isoforms that are included in the annotation,
-while in the latter case it will report novel isoforms as well.
+Ensembl annotation as a guide. 
 
 The Ensembl annotation for `Danio rerio` is available in
 `annotation/Danio_rerio.Zv9.66.gtf`.
 
-The general format of the `cufflinks` command is:
+The general format of the `stringtie` command is:
 
-    cufflinks [options]* <aligned_reads.(sam|bam)>
+    stringtie <aligned_reads_file.bam> [options]
 
 Where the input is the aligned reads (either in SAM or BAM format).
-
-Some of the available parameters for Cufflinks that we are going to use
-to run Cufflinks are listed below:
-
--o
-:   Output directory.
-
--G
-:   Tells Cufflinks to use the supplied GTF annotations strictly in
-    order to estimate isoform annotation.
-
--b
-:   Instructs Cufflinks to run a bias detection and correction algorithm
-    which can significantly improve accuracy of transcript abundance
-    estimates. To do this Cufflinks requires a multi-fasta file with the
-    genomic sequences against which we have aligned the reads.
-
--u
-:   Tells Cufflinks to do an initial estimation procedure to more
-    accurately weight reads mapping to multiple locations in the genome
-    (multi-hits).
-
-–library-type
-:   Before performing any type of RNA-seq analysis you need to know a
-    few things about the library preparation. Was it done using a
-    strand-specific protocol or not? If yes, which strand? In our data
-    the protocol was NOT strand specific.
 
 Perform transcriptome assembly, strictly using the supplied GTF
 annotations, for the `2cells` and `6h` data using cufflinks:
 
-    # 2cells data (takes approx. 5mins):
-    cufflinks -o cufflinks/ZV9_2cells_gtf -G annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_2cells/accepted_hits.bam
-    # 6h data (takes approx. 5mins):
-    cufflinks -o cufflinks/ZV9_6h_gtf -G annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_6h/accepted_hits.bam
+For instance, to run StringTie on 2cells BAM file:
 
-Cufflinks generates several files in the specified output directory.
-Here’s a short description of these files:
+    stringtie -p 8 -G annotation/Danio_rerio.Zv9.66.gtf -o stringtie/ZV9_2cells.gft tophat/ZV9_2cells/accepted_hits.sorted.bam
 
-genes.fpkm\_tracking
-:   Contains the estimated gene-level expression values.
+ 
 
-isoforms.fpkm\_tracking
-:   Contains the estimated isoform-level expression values.
+Repeat this command on the 6h BAM file:
 
-skipped.gtf
-:   Contains loci skipped as a result of exceeding the maximum number of
-    fragments.
+    stringtie -p 8 -G annotation/Danio_rerio.Zv9.66.gtf -o stringtie/ZV9_6h.gft tophat/ZV9_6h/accepted_hits.sorted.bam
 
-transcripts.gtf
-:   This GTF file contains Cufflinks’ assembled isoforms.
+:	-p = number of processing threads
 
-The complete documentation can be found at:
+:	-G = reference annotation file
 
-<http://cole-trapnell-lab.github.io/cufflinks/file_formats/#output-formats-used-in-the-cufflinks-suite>
+:	-o = output file location and name.
 
-So far we have forced cufflinks, by using the `-G` option, to strictly
-use the GTF annotations provided and thus novel transcripts will not be
-reported. We can get cufflinks to perform a GTF-guided transcriptome
-assembly by using the `-g` option instead. Thus, novel transcripts will
-be reported.
+ 
 
-GTF-guided transcriptome assembly is more computationally intensive than
-strictly using the GTF annotations. Therefore, we have pre-computed
-these GTF-guided assemblies for you and have placed the results under
-subdirectories:
+Most RNA sequencing experiments will have multiple samples. As such, Stringtie has a function to merge all transcripts assembled across the samples, which enables inter-sample comparisons to be made. It does this by first assembling all transcripts within each sample, merging the the transcripts and re-running the assembly based off a merged list of genes.
 
-`cufflinks/ZV9_2cells_gtf_guided` and `cufflinks/ZV9_6h_gft_guided`.
+ 
 
-You DO NOT need to run these commands. We provide them so you know how
-we generated the the GTF-guided transcriptome assemblies:
+Prior to running a merge function within stringtie:
+We need to create a mergelist.txt file before utilising the merge function. This is a list of all .gtf files created by stringtie in the above step and can be made in a text editor such as vi or nano. For this exercise, there is a file pre-made for you. The txt file will direct the merge function to look for the names of all the .gtf files that we want to merge.
 
-    # 2cells guided transcriptome assembly (takes approx. 30mins):
-    cufflinks -o cufflinks/ZV9_2cells_gtf_guided -g annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_2cells/accepted_hits.bam
-    # 6h guided transcriptome assembly (takes approx. 30mins):
-    cufflinks -o cufflinks/ZV9_6h_gtf_guided -g annotation/Danio_rerio.Zv9.66.gtf -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded tophat/ZV9_6h/accepted_hits.bam
+ 
+
+To merge StringTie files
+
+    stringtie --merge -p 8 -G annotation/Danio_rerio.Zv9.66.gtf -o stringtie/stringtie_merged.gtf stringtie/mergelist.txt
+
+(mergelist.txt is a text file that will have a list of all .gtf generated by stringtie in the above steps)
+
+Note how a reference gene annotation (Danio_rerio.Zv9.66.gtf) is utilised in this case. This makes use of information we already have in order to assemble the transcriptome of our RNA seq data.
+
+ 
+
+The next step is an optional step to see how your merged annotation compares to reference gene annotation provided. gffcompare is a tool that determines how many of your annotations match the reference (either fully or partial) and how many were completely novel. The output of this ulitily gives you:
+
+Sensitivity is defined as the proportion of genes from the annotation that are correctly reconstructed
+Precision (also known as positive predictive value) captures the proportion of the output that overlaps the annotation
+To compare how merged annotation compares to reference
+
+    gffcompare -G -r annotation/Danio_rerio.Zv9.66.gtf stringtie/stringtie_merged.gtf
+
+:	-r = reference genome in form of gtf
+
+:	-G = tells gffcompare to compare all transcripts in the input file (stringtie/stringtie_merged.gtf), even those that might be redundant
+
+:	-o = all output of gffcompare has a gffcmp. prefix, unless otherwise defined by user
+
+  
+
+Now that we are happy with our merged annotation, we need to estimate the abundance of each transcript within each sample. Stringtie is designed to create output files that are immediately usable in next step of our RNA sequencing pipeline. In this next example, we can direct stringtie to simultaneously create a .ctab file required for ballgown.
+
+ 
+To estimate abundances and create table counts for 2cell 
+
+    stringtie -e -B -p 8 -G stringtie/stringtie_merged.gtf -0 ballgown/ZV9_6h.gtf tophat/ZV9_6h/accepted_hits.sorted.bam
+
+To estimate abundances and create table counts for 2cell 
+
+    stringtie -e -B -p 8 -G stringtie/stringtie_merged.gtf -0 ballgown/ZV9_2cells.gtf tophat/ZV9_2cells/accepted_hits.sorted.bam
+
+:	-e = limits the processing of read alignments to only estimate and output the assembled transcripts matching the reference transcripts (given by -G). Reads with no reference transcripts will be entirely skipped
+
+:	-B = enables output of Ballgown input table files (*.ctab) containing coverage data for the reference transcripts given with the -G option. If -o is used,  StringTie will write the *.ctab files in the same directory as the output GTF.      
+
+:	-p = refers to number of processing threads
+
+:	-G = refers to a reference annotation (in GTF or GFF format)
+
+Visulaizing transcript assembly
+-------------------------------
 
 1.  Go back to IGV and load the pre-computed, GTF-guided transcriptome
     assembly for the `2cells` data
@@ -699,74 +699,6 @@ How many upregulated genes and downregulated genes do we have?
 
 2339 2096
 
-Differential expression using the Voom function and the limma package
----------------------------------------------------------------------
-
-We will now show an alternative approach to differential expression
-which uses the `limma` package.This is based on linear models. The first
-step is to create a design matrix. In this case we have a simple design
-where we have only one condition (treated vs non-treated). However, you
-may be dealing with more complex experimental designs, for example
-looking at treatment and other covariates, such as age, gender, batch.
-
-    design <-model.matrix(~treatment)
-    check design
-    print(design)
-
-We now use voom to transform the data into a form which is appropriate
-for linear modelling.
-
-    v <-voom(y, design)
-
-Next we will fit linear model to each gene in the dataset using the
-function lmFit. Following this we use the function eBayes to test each
-gene to find whether foldchange between the conditions being tested is
-statistically significant.We filter our results by using the same values
-of alpha (0.05) and log fold change (1.5) used previously.
-
-    fit_v <-lmFit(v, design) 
-
-    fit_v <- eBayes(fit_v)
-
-    voom_res<-topTable(fit_v, coef=2,adjust.method="BH", sort.by="P", n=nrow(y$counts)) 
-
-    voom_res_sig <-voom_res[voom_res$adj.P.Val <alpha,]
-
-    voom_res_sig_lfc <-voom_res_sig[abs(voom_res_sig$logFC) >= lfc,]
-
-How many differentially expressed genes are identified?
-
-    nrow(voom_res_sig)nrow(voom_res_sig_lfc)
-
-We will write out these results.
-
-    write.table(voom_res_sig, "voom_res_sig.txt", sep="\t", col.names=NA, quote=F)
-    write.table(voom_res_sig_lfc, "voom_res_sig_lfc.txt", sep="\t", col.names=NA, quote=F)
-    write.table(voom_res, "voom_res.txt", sep="\t", col.names=NA, quote=F) 
-
-Data Visualisation
-------------------
-
-Now let’s visualize some of this data. First we will make a volcano plot
-using the `volcanoplot` function available in `limma`. This creates a
-plot which displays fold changes versus a measure of statistical
-significance of the change.
-
-    volcanoplot(fit_v, coef=2, highlight=5)
-
-[H] ![image](Volcano.png) [fig:Volcano plot]
-
-Next we will create a heatmap of the top differentially expressed genes.
-We use the heatmap.2 function available in the gplots package.
-
-    select_top  <- p.adjust(fit_v$p.value[, 2]) <1e-2
-    Exp_top <- v$E [select_top, ]
-    heatmap.2(Exp_top, scale="row", density.info="none", trace="none", main="Top DEGs", labRow="", cexRow=0.4, cexCol=0.8)
-
-[H] ![image](Heatmap.png) [fig:Heatmap]
-
-You can now quit the R prompt
-
     q()
 
 You can save your workspace by typing `Y` on prompt.
@@ -775,177 +707,6 @@ Please note that the output files you are creating are saved in your
 present working directory. If you are not sure where you are in the file
 system try typing `pwd` on your command prompt to find out.
 
-Differential Expression using cuffdiff
---------------------------------------
-
-This is optional exercise and will be run if time permits.
-
-One of the stand-alone tools that perform differential expression
-analysis is Cuffdiff. We use this tool to compare between two
-conditions; for example different conditions could be control and
-disease, or wild-type and mutant, or various developmental stages.
-
-In our case we want to identify genes that are differentially expressed
-between two developmental stages; a `2cells` embryo and `6h` post
-fertilization.
-
-The general format of the cuffdiff command is:
-
-    cuffdiff [options]* <transcripts.gtf> <sample1_replicate1.sam[,...,sample1_replicateM]> <sample2_replicate1.sam[,...,sample2_replicateM.sam]>
-
-Where the input includes a `transcripts.gtf` file, which is an
-annotation file of the genome of interest or the cufflinks assembled
-transcripts, and the aligned reads (either in SAM or BAM format) for the
-conditions. Some of the Cufflinks options that we will use to run the
-program are:
-
--o
-:   Output directory.
-
--L
-:   Labels for the different conditions
-
--T
-:   Tells Cuffdiff that the reads are from a time series experiment.
-
--b
-:   Instructs Cufflinks to run a bias detection and correction algorithm
-    which can significantly improve accuracy of transcript abundance
-    estimates. To do this Cufflinks requires a multi-fasta file with the
-    genomic sequences against which we have aligned the reads.
-
--u
-:   Tells Cufflinks to do an initial estimation procedure to more
-    accurately weight reads mapping to multiple locations in the genome
-    (multi-hits).
-
-–library-type
-:   Before performing any type of RNA-seq analysis you need to know a
-    few things about the library preparation. Was it done using a
-    strand-specific protocol or not? If yes, which strand? In our data
-    the protocol was NOT strand specific.
-
--C
-:   Biological replicates and multiple group contrast can be defined
-    here
-
-Run cuffdiff on the tophat generated BAM files for the 2cells vs. 6h
-data sets:
-
-    cuffdiff -o cuffdiff/ -L ZV9_2cells,ZV9_6h -T -b genome/Danio_rerio.Zv9.66.dna.fa -u --library-type fr-unstranded annotation/Danio_rerio.Zv9.66.gtf tophat/ZV9_2cells/accepted_hits.bam tophat/ZV9_6h/accepted_hits.bam
-
-We are interested in the differential expression at the gene level. The
-results are reported by Cuffdiff in the file `cuffdiff/gene_exp.diff`.
-Look at the first few lines of the file using the following command:
-
-    head -n 20 cuffdiff/gene_exp.diff
-
-We would like to see which are the most significantly differentially
-expressed genes. Therefore we will sort the above file according to the
-q value (corrected p value for multiple testing). The result will be
-stored in a different file called `gene_exp_qval.sorted.diff`.
-
-    sort -t$'\t' -g -k 13 cuffdiff/gene_exp.diff > cuffdiff/gene_exp_qval.sorted.diff
-
-Look again at the top 20 lines of the sorted file by typing:
-
-    head -n 20 cuffdiff/gene_exp_qval.sorted.diff
-
-Copy an Ensembl transcript identifier from the first two columns for one
-of these genes (e.g. `ENSDARG00000045067`). Now go back to the IGV
-browser and paste it in the search box.
-
-What are the various outputs generated by cuffdiff? Hint: Please refer
-to the `Cuffdiff output` section of the cufflinks manual online.
-
-Do you see any difference in the read coverage between the `2cells` and
-`6h` conditions that might have given rise to this transcript being
-called as differentially expressed?
-
-The coverage on the Ensembl browser is based on raw reads and no
-normalisation has taken place contrary to the FPKM values.
-
-The read coverage of this transcript (`ENSDARG00000045067`) in the 6h
-data set is much higher than in the 2cells data set.
-
-Visualising the CuffDiff expression analysis
---------------------------------------------
-
-We will use an R-Bioconductor package called `cummeRbund` to visualise,
-manipulate and explore Cufflinks RNA-seq output. We will load an R
-environment and look at few quick tips to generate simple graphical
-output of the cufflinks analysis we have just run.
-
-`CummeRbund` takes the cuffdiff output and populates a SQLite database
-with various type of output generated by cuffdiff e.g, genes,
-transcripts, transcription start site, isoforms and CDS regions. The
-data from this database can be accessed and processed easily. This
-package comes with a number of in-built plotting functions that are
-commonly used for visualising the expression data. We strongly recommend
-reading through the bioconductor manual and user guide of CummeRbund to
-learn about functionality of the tool. The reference is provided in the
-resource section.
-
-Prepare the environment. Go to the `cuffdiff` output folder and copy the
-transcripts file there.
-
-    cd /home/trainee/rnaseq/cuffdiff
-    cp /home/trainee/rnaseq/annotation/Danio_rerio.Zv9.66.gtf /home/trainee/rnaseq/cuffdiff
-    ls -l
-
-Load the R environment
-
-    R (press enter)
-
-Load the require R package.
-
-    library(cummeRbund)
-
-Read in the cuffdiff output
-
-    cuff<-readCufflinks(dir="/home/trainee/Desktop/rnaseq/cuffdiff", \
-    gtfFile='Danio_rerio.Zv9.66.gtf',genome="Zv9", rebuild=T)
-
-Assess the distribution of FPKM scores across samples
-
-    pdf(file = "SCV.pdf", height = 6, width = 6)
-    dens<-csDensity(genes(cuff))
-    dens
-    dev.off()
-
-Box plots of the FPKM values for each samples
-
-    pdf(file = "BoxP.pdf", height = 6, width = 6)
-    b<-csBoxplot(genes(cuff))
-    b
-    dev.off()
-
-Accessing the data
-
-    sigGeneIds<-getSig(cuff,alpha=0.05,level="genes")
-    head(sigGeneIds)
-    sigGenes<-getGenes(cuff,sigGeneIds)
-    sigGenes
-    head(fpkm(sigGenes))
-    head(fpkm(isoforms(sigGenes)))
-
-Plotting a heatmap of the differentially expressed genes
-
-    pdf(file = "heatmap.pdf", height = 6, width = 6)
-    h<-csHeatmap(sigGenes,cluster="both")
-    h
-    dev.off()
-
-What options would you use to draw a density or boxplot for different
-replicates if available ? (Hint: look at the manual at Bioconductor
-website)
-
-    densRep<-csDensity(genes(cuff),replicates=T)
-    brep<-csBoxplot(genes(cuff),replicates=T)
-
-How many differentially expressed genes did you observe?
-
-type ’summary(sigGenes)’ on the R prompt to see.
 
 References
 ----------
