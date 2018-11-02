@@ -7,9 +7,9 @@ btp::modules:
       - 'rnaseq/genome'
       - 'rnaseq/genome/ZV9_bowtie_index'
       - 'rnaseq/cuffdiff'
-      - 'rnaseq/cufflinks'
-      - 'rnaseq/cufflinks/ZV9_2cells_gtf_guided'
-      - 'rnaseq/cufflinks/ZV9_6h_gtf_guided'
+      - 'rnaseq/stringtie'
+      - 'rnaseq/stringtie/ZV9_2cells_gtf_guided'
+      - 'rnaseq/stringtie/ZV9_6h_gtf_guided'
       - 'rnaseq/tophat'
       - 'rnaseq/tophat/ZV9_2cells'
       - 'rnaseq/tophat/ZV9_6h'
@@ -106,35 +106,35 @@ btp::modules:
       2cells_genes.fpkm_tracking: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
-          - 'rnaseq/cufflinks/ZV9_2cells_gtf_guided/genes.fpkm_tracking'
+          - 'rnaseq/stringtie/ZV9_2cells_gtf_guided/genes.fpkm_tracking'
       2cells_isoforms.fpkm_tracking: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
-          - 'rnaseq/cufflinks/ZV9_2cells_gtf_guided/isoforms.fpkm_tracking'
+          - 'rnaseq/stringtie/ZV9_2cells_gtf_guided/isoforms.fpkm_tracking'
       2cells_transcripts.gtf: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
-          - 'rnaseq/cufflinks/ZV9_2cells_gtf_guided/transcripts.gtf'
+          - 'rnaseq/stringtie/ZV9_2cells_gtf_guided/transcripts.gtf'
       2cells_skipped.gtf: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
-          - 'rnaseq/cufflinks/ZV9_2cells_gtf_guided/skipped.gtf'
+          - 'rnaseq/stringtie/ZV9_2cells_gtf_guided/skipped.gtf'
       6h_genes.fpkm_tracking: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
-          - 'rnaseq/cufflinks/ZV9_6h_gtf_guided/genes.fpkm_tracking'
+          - 'rnaseq/stringtie/ZV9_6h_gtf_guided/genes.fpkm_tracking'
       6h_isoforms.fpkm_tracking: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
-          - 'rnaseq/cufflinks/ZV9_6h_gtf_guided/isoforms.fpkm_tracking'
+          - 'rnaseq/stringtie/ZV9_6h_gtf_guided/isoforms.fpkm_tracking'
       6h_transcripts.gtf: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
-          - 'rnaseq/cufflinks/ZV9_6h_gtf_guided/transcripts.gtf'
+          - 'rnaseq/stringtie/ZV9_6h_gtf_guided/transcripts.gtf'
       6h_skipped.gtf: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
-          - 'rnaseq/cufflinks/ZV9_6h_gtf_guided/skipped.gtf'
+          - 'rnaseq/stringtie/ZV9_6h_gtf_guided/skipped.gtf'
       accepted_hits.bam: 
         source: 'https://s3-ap-southeast-2.amazonaws.com/ngs-data-rnaseq'
         targets: 
