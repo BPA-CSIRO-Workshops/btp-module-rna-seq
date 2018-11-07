@@ -518,12 +518,12 @@ Once on the R prompt. Load libraries:
 ### Read in Data
 
 Read in count table and experimental design:
-
+```
     data <- read.delim("pnas_expression.txt", row.names=1, header=T)
     targets <- read.delim("Targets.txt", header=T)
     colnames(data) <-targets$Label
     head(data, n=20)
-
+```
 ### Add Gene annotation
 
 The data set only includes the Ensembl gene id and the counts. It is
@@ -579,10 +579,10 @@ We see we have 37435 rows (i.e. genes) and 7 columns (samples).
 Now we will filter out genes with low counts by only keeping those rows
 where the count per million (cpm) is at least 1 in at least three
 samples:
-
+```
     keep <-rowSums( cpm(y)>1) >=3
     y <- y[keep, ]
-
+```
 How many rows (genes) are retained now
 
 dim(y) would give you 16494
@@ -596,20 +596,20 @@ per sample has not changed greatly. Let us check the total number of
 reads per sample in the original data (data) and now after filtering.
 
 Before:
-
+```
     colSums(data[,1:7])
     After filtering:
     colSums(y$counts)
-
+```
 We will now perform normalization to take account of different library
 size:
-
+```
     y<-calcNormFactors(y)
-
+```
 We will check the calculated normalization factors:
-
+```
     y$samples
-
+```
 Lets have a look at whether the samples cluster by condition. (You
 should produce a plot as shown in Figure 4):
 
@@ -675,24 +675,24 @@ exact test for the negative binomial distribution (Robinson and Smyth,
 ### Testing for Differential Expression
 
 We now test for differentially expressed BCV genes:
-
+```
     et <- exactTest(y)
-
+```
 Now we will use the topTags function to adjust for multiple testing. We
 will use the Benjimini Hochberg ("BH") method and we will produce a
 table of results:
-
+```
     res <- topTags(et, n=nrow(y$counts), adjust.method="BH")$table
-
+```
 Let’s have a look at the first rows of the table:
 
     head(res)
 
 To get a summary of the number of differentially expressed genes we can
 use the decideTestsDGE function.
-
+```
     summary(de <- decideTestsDGE(et))
-
+```
 This tells us that 2096 genes are downregulated and 2339 genes are
 upregulated at 5% FDR.We will now make subsets of the most significant
 upregulated and downregulated genes.
