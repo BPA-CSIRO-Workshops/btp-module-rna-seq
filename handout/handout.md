@@ -478,7 +478,7 @@ androgen hormone (DHT). Four replicates were collected from cells
 treated with an inactive compound. Each of the seven samples was run on
 a lane (7 lanes) of an Illumina flow cell to produce 35 bp reads. The
 experimental design was therefore:
-
+```
 [H]
 
 rrr
@@ -493,7 +493,7 @@ rrr
 7 & DHT & DHT3\
 
 [tab:experimental~d~esign]
-
+```
 This workflow requires raw gene count files and these can be generated
 using a utility called featureCounts as demonstrated above. We are using
 a pre-computed gene counts data (stored in `pnas_expression.txt`) for
@@ -533,32 +533,32 @@ to do this.
 
 We start by using the useMart function of BiomaRt to access the human
 data base of ensemble gene ids.
-
+```
     human<-useMart(host="www.ensembl.org", "ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") attributes=c("ensembl_gene_id", "entrezgene","hgnc_symbol")
-
+```
 We create a vector of our ensemble gene ids.
-
+```
     ensembl_names<-rownames(data)
     head(ensembl_names)
-
+```
 We then use the function getBM to get the gene symbol data we want.This
 takes about a minute.
-
+```
     genemap<-getBM(attributes, filters="ensembl_gene_id", values=ensembl_names, mart=human)
-
+```
 Have a look at the start of the genemap dataframe.
 
     head(genemap)
 
 We then match the data we have retrieved to our dataset.
-
+```
     idx <-match(ensembl_names, genemap$ensembl_gene_id)
     data$entrezgene <-genemap$entrezgene [ idx ]
     data$hgnc_symbol <-genemap$hgnc_symbol [ idx ]
     Ann <- cbind(rownames(data), data$hgnc_symbol, data$entrezgene)
     colnames(Ann)<-c("Ensembl", "Symbol", "Entrez")
     Ann<-as.data.frame(Ann)
-
+```
 Let’s check and see that this additional information is there.
 
     head(data)
