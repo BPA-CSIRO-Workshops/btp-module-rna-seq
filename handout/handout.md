@@ -566,10 +566,10 @@ Let’s check and see that this additional information is there.
 ### Data checks
 
 Create DGEList object:
-
+```
     treatment <-factor(c(rep("Control",4), rep("DHT",3)), levels=c("Control", "DHT"))
     y <-DGEList(counts=data[,1:7], group=treatment, genes=Ann)
-
+```
 Check the dimensions of the object:
 
     dim(y)
