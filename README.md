@@ -45,7 +45,7 @@ Bioinformatics Training Platform (BTP) Module: RNA-Seq
   * Key Learning Outcomes
     * Understand and perform a simple RNA-Seq analysis workflow.
     * Perform spliced alignments to an indexed reference genome using TopHat.
-    * Perform transcript assembly using Cufflinks.
+    * Perform transcript assembly using Stringtie.
     * Visualize transcript alignments and annotation in a genome browser such as IGV.
     * Be able to identify differential gene expression between two experimental conditions.
     * Be familiar with R environment and be able to run R based RNA-seq packages.
