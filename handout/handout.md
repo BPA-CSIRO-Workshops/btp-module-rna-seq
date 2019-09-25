@@ -3,7 +3,7 @@ Key Learning Outcomes
 
 After completing this practical the trainee should be able to:
 
--   Understand and perform a simple RNA-Seq analysis workflow.
+-   Understand and perform a two condition RNA-Seq expression analysis workflow.
 
 -   Perform spliced alignments to an indexed reference genome using
     TopHat.
