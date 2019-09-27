@@ -176,28 +176,23 @@ head -n 20 data/2cells_1.fastq
 Some other parameters that we are going to use to run Tophat are listed
 below:
 
--g
-:   Maximum number of multihits allowed. Short reads are likely to map
+-p `-g` : Maximum number of multihits allowed. Short reads are likely to map
     to more than one location in the genome even though these reads can
     have originated from only one of these regions. In RNA-seq we allow
     for a limited number of multihits, and in this case we ask Tophat to
     report only reads that map at most onto 2 different loci.
-
-–library-type
-:   Before performing any type of RNA-seq analysis you need to know a
+- `–library-type`:   Before performing any type of RNA-seq analysis you need to know a
     few things about the library preparation. Was it done using a
     strand-specific protocol or not? If yes, which strand? In our data
     the protocol was NOT strand specific.
 
--j
-:   Improve spliced alignment by providing Tophat with annotated splice
+- `-j`:   Improve spliced alignment by providing Tophat with annotated splice
     junctions. Pre-existing genome annotation is an advantage when
     analysing RNA-seq data. This file contains the coordinates of
     annotated splice junctions from Ensembl. These are stored under the
     sub-directory `annotation` in a file called `ZV9.spliceSites`.
 
--o
-:   This specifies in which subdirectory Tophat should save the output
+- `-o`:  This specifies in which subdirectory Tophat should save the output
     files. Given that for every run the name of the output files is the
     same, we specify different directories for each run.
 
@@ -205,7 +200,7 @@ It takes some time (approx. 20 min) to perform tophat spliced
 alignments, even for this subset of reads. Therefore, we have
 pre-aligned the `2cells` data for you using the following command:
 
-You DO NOT need to run this command yourself - we have done this for
+You **DO NOT** need to run this command yourself - we have done this for
 you.
 
 ```bash
@@ -226,13 +221,13 @@ pre-computed `2cells` data.
 Tophat generates several files in the specified output directory. The
 most important files are listed below.
 
-accepted\_hits.bam
+`accepted_hits.bam`
 :   This file contains the list of read alignments in BAM format.
 
-align\_summary.txt
+`align_summary.txt`
 :   Provides a detailed summary of the read-alignments.
 
-unmapped.bam
+`unmapped.bam`
 :   This file contains the unmapped reads.
 
 The complete documentation can be found at:
@@ -478,22 +473,17 @@ androgen hormone (DHT). Four replicates were collected from cells
 treated with an inactive compound. Each of the seven samples was run on
 a lane (7 lanes) of an Illumina flow cell to produce 35 bp reads. The
 experimental design was therefore:
-```
-[H]
 
-rrr
 
-**Lane** & **Treatment** & **Label**\
-1 & Control & Con1\
-2 & Control & Con2\
-3 & Control & Con3\
-4 & Control & Con4\
-5 & DHT & DHT1\
-6 & DHT & DHT2\
-7 & DHT & DHT3\
+**Lane** | **Treatment** | **Label**|
+1 | Control | Con1|
+2 | Control | Con2|
+3 | Control | Con3|
+4 | Control | Con4|
+5 | DHT | DHT1|
+6 | DHT | DHT2|
+7 | DHT | DHT3|
 
-[tab:experimental~d~esign]
-```
 This workflow requires raw gene count files and these can be generated
 using a utility called featureCounts as demonstrated above. We are using
 a pre-computed gene counts data (stored in `pnas_expression.txt`) for
@@ -503,18 +493,19 @@ this exercise.
 
 Prepare the environment and load R:
 
+```
     cd /home/trainee/rnaseq/edgeR
     R (press enter)
-
+```
 Once on the R prompt. Load libraries:
-
+```
     library(edgeR)
     library(biomaRt)
     library(gplots)
     library("limma")
     library("RColorBrewer")
     library("org.Hs.eg.db")
-
+```
 ### Read in Data
 
 Read in count table and experimental design:
@@ -534,7 +525,7 @@ to do this.
 We start by using the useMart function of BiomaRt to access the human
 data base of ensemble gene ids.
 ```
-    human<-useMart(host="www.ensembl.org", "ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") attributes=c("ensembl_gene_id", "entrezgene","hgnc_symbol")
+    human<-useMart(host="www.ensembl.org", "ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl") attributes=c("ensembl_gene_id", "entrezgene_id","hgnc_symbol")
 ```
 We create a vector of our ensemble gene ids.
 ```
@@ -547,22 +538,22 @@ takes about a minute.
     genemap<-getBM(attributes, filters="ensembl_gene_id", values=ensembl_names, mart=human)
 ```
 Have a look at the start of the genemap dataframe.
-
+```
     head(genemap)
-
+```
 We then match the data we have retrieved to our dataset.
 ```
     idx <-match(ensembl_names, genemap$ensembl_gene_id)
-    data$entrezgene <-genemap$entrezgene [ idx ]
+    data$entrezgene <-genemap$entrezgene_id [ idx ]
     data$hgnc_symbol <-genemap$hgnc_symbol [ idx ]
     Ann <- cbind(rownames(data), data$hgnc_symbol, data$entrezgene)
     colnames(Ann)<-c("Ensembl", "Symbol", "Entrez")
     Ann<-as.data.frame(Ann)
 ```
 Let’s check and see that this additional information is there.
-
+```
     head(data)
-
+```
 ### Data checks
 
 Create DGEList object:
@@ -571,9 +562,9 @@ Create DGEList object:
     y <-DGEList(counts=data[,1:7], group=treatment, genes=Ann)
 ```
 Check the dimensions of the object:
-
+```
     dim(y)
-
+```
 We see we have 37435 rows (i.e. genes) and 7 columns (samples).
 
 Now we will filter out genes with low counts by only keeping those rows
@@ -585,7 +576,7 @@ samples:
 ```
 How many rows (genes) are retained now
 
-dim(y) would give you 16494
+`dim(y)` would give you 16494
 
 How many genes were filtered out?
 
