@@ -28,7 +28,7 @@ We also have bonus exercises where you can learn to:
 ## Author Information
 
 *Primary Author(s):*
-Sonika Tyagi, Monash University and  Susan Corley UNSW
+Sonika Tyagi, Monash University and  Susan Corley, UNSW
 
 *Contributor)s)*
 Myrto Kostadima EBI UK
